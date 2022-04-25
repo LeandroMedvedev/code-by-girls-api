@@ -1,6 +1,8 @@
-from sqlalchemy.sql.schema import Column, ForeignKey
-from sqlalchemy.sql.sqltypes import Integer
-
 from app.configs import db
 
-users_groups = db.Table("users_groups")
+users_groups_table = db.Table(
+    "users_groups",
+    db.Column("id", db.Integer, primary_key=True),
+    db.Column("user_id", db.Integer, db.ForeignKey("users.id")),
+    db.Column("group_id", db.Integer, db.ForeignKey("groups.id")),
+)
