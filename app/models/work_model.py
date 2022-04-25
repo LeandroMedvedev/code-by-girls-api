@@ -10,3 +10,4 @@ from app.configs import db
 class Work(db.Model):
 
     __tablename__ = "works"
+    
