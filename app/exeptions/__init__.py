@@ -1,0 +1,2 @@
+class LevelInvalidError(Exception):
+    pass
