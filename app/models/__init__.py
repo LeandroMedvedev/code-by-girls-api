@@ -1,4 +1,4 @@
-from .comment_user_group import CommentUserGroup
+from .comment_user_group_table import commentUserGroupTable
 from .group_model import Group
 from .level_model import Level
 from .skill_model import Skill
