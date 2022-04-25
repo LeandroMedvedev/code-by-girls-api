@@ -1,7 +1,7 @@
 from flask import request, current_app, jsonify
 from flask_jwt_extended import get_jwt_identity
 from psycopg2 import IntegrityError
-from ..exeptions import LevelInvalidError
+from ..exceptions import LevelInvalidError
 from ..models.skill_model import Skill
 
 
