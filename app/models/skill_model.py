@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from sqlalchemy.orm import validates
-from ..exceptions import LevelInvalidError
+from app.exceptions import LevelInvalidError
 from sqlalchemy import Column, String, Integer
 
 from app.configs import db

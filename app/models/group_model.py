@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from sqlalchemy.sql.schema import Column
+from sqlalchemy.sql.schema import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import Integer, Text, VARCHAR
 
 from app.configs import db
@@ -16,3 +16,4 @@ class Group(db.Model):
     id = Column(Integer, primary_key=True)
     name = Column(VARCHAR(50), nullable=False)
     description = Column(Text, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
