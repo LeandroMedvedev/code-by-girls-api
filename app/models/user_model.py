@@ -4,7 +4,7 @@ from app.configs import db
 from sqlalchemy.sql.schema import Column
 from sqlalchemy.sql.sqltypes import Integer, String
 
-from app.exeptions import InvalidEmailError
+from app.exceptions import InvalidEmailError
 
 
 @dataclass
