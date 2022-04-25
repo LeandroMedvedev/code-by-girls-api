@@ -1,6 +1,6 @@
 from http import HTTPStatus
 from flask import request, jsonify
-from app.exeptions import InvalidEmailError
+from app.exceptions import InvalidEmailError
 from app.models.user_model import User
 from sqlalchemy.orm.session import Session
 from app.configs.database import db
