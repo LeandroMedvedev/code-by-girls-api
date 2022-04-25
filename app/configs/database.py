@@ -13,8 +13,6 @@ def init_app(app: Flask):
     from app.models import Level
     from app.models import Skill
     from app.models import User
-    from app.models import CommentUserGroup
-    from app.models import users_groups
     from app.models import Work
     from app.models import comments_users_groups_table
-    from app.models import users_groups
+    from app.models import users_groups_table
