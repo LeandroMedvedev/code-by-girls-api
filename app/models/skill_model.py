@@ -1,12 +1,10 @@
+from dataclasses import dataclass
 
 from sqlalchemy import Column, String, Integer
-from..exceptions import LevelInvalidError
 from sqlalchemy.orm import validates
-from dataclasses import dataclass
+
+from ..exceptions import LevelInvalidError
 from app.configs import db
-
-
-
 
 
 @dataclass
@@ -26,4 +24,3 @@ class SkillModel(db.Model):
     def validade_importance(self,key,level):
         if level != "Iniciante" and level != "Intermediario" and level != "Avançado":
             raise LevelInvalidError
-
