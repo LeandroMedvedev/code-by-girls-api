@@ -20,4 +20,3 @@ class SkillModel(db.Model):
     skill = Column(String(100), nullable=False, unique=True)
     level = Column(Enum(Values), nullable=False)
     user_id = Column(Integer, db.ForeignKey("users.id"), nullable=False)
-
