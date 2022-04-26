@@ -1,9 +1,11 @@
 from dataclasses import dataclass
-from sqlalchemy.orm import relationship
-from sqlalchemy.sql.schema import Column
-from sqlalchemy.sql.sqltypes import Integer,String
-
+from sqlalchemy.orm import validates,relationship
 from app.configs import db
+from sqlalchemy.sql.schema import Column
+from sqlalchemy.sql.sqltypes import Integer, String
+
+
+from app.exceptions import InvalidEmailError
 
 
 @dataclass
@@ -26,3 +28,9 @@ class UserModel(db.Model):
 
     skills = relationship("SkillModel", backref="user")
     works = relationship("WorkModel", backref="user")
+
+
+    @validates("email")
+    def validate_email(self, key, email):
+        if "@" not in email or email.endswith(".com"):
+            raise InvalidEmailError
