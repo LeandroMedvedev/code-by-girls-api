@@ -5,7 +5,7 @@ from sqlalchemy.sql.schema import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import Integer, Text, VARCHAR
 
 from app.configs import db
-from app.models import users_groups_table
+from .user_group_table import users_groups_table
 
 
 @dataclass
