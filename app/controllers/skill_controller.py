@@ -49,6 +49,3 @@ def delete_skill(id):
     session.delete(skill)
     session.commit()
     return "", 204
-
- 
-   

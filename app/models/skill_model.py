@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer,Enum
+from sqlalchemy import Column, String, Integer, Enum
 from dataclasses import dataclass
 from app.configs import db
 import enum
