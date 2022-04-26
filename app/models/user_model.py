@@ -4,6 +4,8 @@ from app.configs import db
 from sqlalchemy.sql.schema import Column
 from sqlalchemy.sql.sqltypes import Integer, String
 
+from werkzeug.security import check_password_hash, generate_password_hash
+
 from app.exceptions import InvalidEmailError
 
 
@@ -27,3 +29,17 @@ class User(db.Model):
         if "@" not in email or email.endswith(".com"):
             raise InvalidEmailError
             
+    
+    @property
+    def password(self):
+        raise AttributeError("Password cannot be accessed!")
+
+
+    @password.setter
+    def password(self, password_to_hash):
+        self.password = generate_password_hash(password_to_hash)
+
+
+    def verify_password(self, compare_to_password):
+        return check_password_hash(self.password, compare_to_password)
+        
