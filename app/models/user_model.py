@@ -10,7 +10,7 @@ from app.exceptions import InvalidEmailError
 
 
 @dataclass
-class User(db.Model):
+class UserModel(db.Model):
     id : int
     name: str
     email: str

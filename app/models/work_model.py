@@ -7,7 +7,7 @@ from app.configs import db
 
 
 @dataclass
-class Work(db.Model):
+class WorkModel(db.Model):
     title: str
     description: str
 

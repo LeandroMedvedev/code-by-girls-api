@@ -2,7 +2,7 @@ from flask import request, current_app, jsonify
 from flask_jwt_extended import get_jwt_identity
 from psycopg2 import IntegrityError
 from ..exceptions import LevelInvalidError
-from ..models.skill_model import Skill
+from ..models.skill_model import SkillModel
 
 
 def create_skill():
@@ -13,7 +13,7 @@ def create_skill():
         level = data.pop["level"]
         data["user_id"]=user.id
         data["level_id"] = level
-        skill = Skill(**data)
+        skill = SkillModel(**data)
 
         session.add(skill)
         session.commit()

@@ -8,7 +8,7 @@ from app.configs import db
 
 
 @dataclass
-class Skill(db.Model):
+class SkillModel(db.Model):
     skill = str
     level = str
 
