@@ -7,7 +7,7 @@ from app.configs import db
 
 
 @dataclass
-class Group(db.Model):
+class GroupModel(db.Model):
     name: str
     description: str
 
