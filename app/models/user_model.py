@@ -1,11 +1,12 @@
 from dataclasses import dataclass
-from sqlalchemy.orm import validates
-from app.configs import db
+
+from sqlalchemy.orm import validates, relationship
 from sqlalchemy.sql.schema import Column
 from sqlalchemy.sql.sqltypes import Integer, String
 
 from werkzeug.security import check_password_hash, generate_password_hash
 
+from app.configs import db
 from app.exceptions import InvalidEmailError
 
 
@@ -23,6 +24,8 @@ class UserModel(db.Model):
     email = Column(String(100), nullable=False, unique=True)
     password = Column(String)
 
+    skills = relationship("SkillModel", backref="user")
+    works = relationship("WorkModel", backref="user")
 
     @validates("email")
     def validate_email(self, key, email):
