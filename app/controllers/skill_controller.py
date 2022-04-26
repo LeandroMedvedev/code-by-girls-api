@@ -1,8 +1,10 @@
-from flask import request, current_app, jsonify
 from flask_jwt_extended import get_jwt_identity,jwt_required
+from flask import request, current_app, jsonify
+from ..models.skill_model import SkillModel
 from psycopg2 import IntegrityError
+from ..exceptions import LevelInvalidError
 
-from ..models import SkillModel
+
 
 
 def create_skill():
@@ -19,6 +21,8 @@ def create_skill():
         return jsonify(skill),201
     except IntegrityError:
         return{"msg": "skill ja existente"},409
+    except LevelInvalidError:
+        return {"msg":"Level invalido, o valor deve ser Iniciante,Intermediario ou Avançado"},400
 
 @jwt_required
 def get_skill():
