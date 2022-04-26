@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from models.user_model import UserModel
+from app.models.user_model import UserModel
 from http import HTTPStatus
 from psycopg2.errors import UniqueViolation
 from sqlalchemy.exc import IntegrityError
@@ -33,4 +33,34 @@ def get_user():
         UserModel.query.all()
     )
 
-    return jsonify(users), 200
+    return jsonify(users), HTTPStatus.OK
+
+
+def att_user(id):
+    try:
+        session : Session = db.session
+        data = request.get_json()
+        value_in_update = UserModel.query.get(id)
+
+        for key,values in data.items():
+            setattr(value_in_update,key,values)
+        
+        session.add(value_in_update)
+        session.commit()
+
+        return jsonify(value_in_update),HTTPStatus.OK
+
+
+    except:
+        ...
+
+
+def delete_user(id):
+    try:
+        query = UserModel.query.get(id)
+        session : Session = db.session
+        session.delete(query)
+        session.commit()
+        return "",HTTPStatus.NO_CONTENT
+    except:
+        ...
