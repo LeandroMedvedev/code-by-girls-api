@@ -1,2 +1,2 @@
-class LevelInvalidError(Exception):
+class InvalidEmailError(Exception):
     pass
