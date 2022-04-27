@@ -17,7 +17,6 @@ class UserModel(db.Model):
     email:str
     skills:list
     works:list
-    # password:str
 
     __tablename__ = "users"
 
@@ -46,9 +45,9 @@ class UserModel(db.Model):
 
     @password.setter
     def password(self, password_to_hash):
-        self.password = generate_password_hash(password_to_hash)
+        self.password_hash = generate_password_hash(password_to_hash)
 
 
     def verify_password(self, compare_to_password):
-        return check_password_hash(self.password, compare_to_password)
+        return check_password_hash(self.password_hash, compare_to_password)
         
