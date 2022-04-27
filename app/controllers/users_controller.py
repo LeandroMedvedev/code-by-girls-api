@@ -4,7 +4,8 @@ from http import HTTPStatus
 from psycopg2.errors import UniqueViolation
 from sqlalchemy.exc import IntegrityError
 from app.exceptions import InvalidEmailError
-from sqlalchemy.orm.session import Session
+from sqlalchemy.orm import Session, Query
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 def create_user():
     try:
@@ -27,6 +28,7 @@ def create_user():
             return {"error": "EMAIL is alredy exists"}, HTTPStatus.CONFLICT
 
 
+@jwt_required()
 def get_user():
     users=(
         UserModel.query.all()
@@ -35,31 +37,57 @@ def get_user():
     return jsonify(users), HTTPStatus.OK
 
 
+@jwt_required()
 def att_user(id):
     try:
-        session : Session = db.session
-        data = request.get_json()
-        value_in_update = UserModel.query.get(id)
+        session : Session = current_app.db.session
+        data:dict = request.get_json()
+        user_auth = get_jwt_identity()
+
+        user: Query = (
+            session
+            .query(UserModel)
+            .filter_by(id=user_auth["id"])
+            .filter_by(id=id)
+            .first()
+        )
+
+        if not user:
+            return {"error": "id not found"}, HTTPStatus.NOT_FOUND
+
 
         for key,values in data.items():
-            setattr(value_in_update,key,values)
+            setattr(user,key,values)
         
-        session.add(value_in_update)
         session.commit()
 
-        return jsonify(value_in_update),HTTPStatus.OK
+        return jsonify(user),HTTPStatus.OK
 
 
     except:
-        ...
+        return {"error": "error"}, HTTPStatus.BAD_REQUEST
 
 
+@jwt_required()
 def delete_user(id):
     try:
-        query = UserModel.query.get(id)
-        session : Session = db.session
-        session.delete(query)
+        session : Session = current_app.db.session
+        user_auth = get_jwt_identity()
+
+        user: Query = (
+            session
+            .query(UserModel)
+            .filter_by(id=user_auth["id"])
+            .filter_by(id=id)
+            .first()
+        )
+
+        if not user:
+            return {"error": "id not found"}, HTTPStatus.NOT_FOUND
+
+        session.delete(user)
         session.commit()
-        return "",HTTPStatus.NO_CONTENT
+
+        return "", HTTPStatus.NO_CONTENT
     except:
-        ...
+        return {"error": "error"}, HTTPStatus.BAD_REQUEST
