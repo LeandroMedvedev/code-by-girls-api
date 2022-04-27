@@ -35,6 +35,7 @@ class UserModel(db.Model):
     def validate_email(self, key, email):
         if "@" not in email or email.endswith(".com"):
             raise InvalidEmailError
+        return email
             
     
     @property

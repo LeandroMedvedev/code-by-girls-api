@@ -1,7 +1,7 @@
 from flask import Flask
 
 from app import routes
-from app.configs import database, env_config, migration
+from app.configs import database, env_config, migration,jwt
 
 
 def create_app():
@@ -10,6 +10,7 @@ def create_app():
     env_config.init_app(app)
     database.init_app(app)
     migration.init_app(app)
+    jwt.init_app(app)
     routes.init_app(app)
 
     return app
