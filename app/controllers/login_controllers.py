@@ -9,6 +9,10 @@ from flask_jwt_extended import create_access_token
 def login():
     session: Session = current_app.db.session
     data = request.get_json()
+    new_data = {
+        "email": data["email"],
+        "password_hash": data["password"]
+    }
 
     user: UserModel = session.query(UserModel).filter_by(email=data["email"]).first()
 
@@ -16,7 +20,7 @@ def login():
         return {"error": "user not found!"}, HTTPStatus.NOT_FOUND
 
     
-    if user.verify_password(data["password"]):
+    if user.verify_password(data["password_hash"]):
         data = {
             "id": user.id,
             "name": user.name,

@@ -25,7 +25,7 @@ class UserModel(db.Model):
     id = Column(Integer, primary_key = True)
     name = Column(String(50), nullable = False)
     email = Column(String(100), nullable = False, unique = True)
-    password = Column(String)
+    password_hash = Column(String)
 
     skills = relationship("SkillModel", backref="user")
     works = relationship("WorkModel", backref="user")
@@ -33,8 +33,10 @@ class UserModel(db.Model):
 
     @validates("email")
     def validate_email(self, key, email):
-        if "@" not in email or email.endswith(".com"):
+        if "@" not in email or not email.endswith(".com"):
             raise InvalidEmailError
+        
+        return email
             
     
     @property
