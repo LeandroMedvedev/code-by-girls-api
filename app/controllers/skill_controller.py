@@ -1,7 +1,6 @@
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask import request, current_app, jsonify
 from ..models.skill_model import SkillModel
-from psycopg2 import IntegrityError
 from ..exceptions import LevelInvalidError
 
 
@@ -11,40 +10,51 @@ def create_skill():
         session = current_app.db.session
         data = request.get_json()
         user = get_jwt_identity()
-        data["user_id"]=user.id
+        data["user_id"]=user["id"]
         skill = SkillModel(**data)
         session.add(skill)
         session.commit()
         return jsonify(skill),201
-    except IntegrityError:
-        return{"msg": "skill ja existente"},409
+    except TypeError:
+        return{"msg":{"valid_keys":
+        {"skill":"","level":""},
+        "your_keys":data}},400
+
     except LevelInvalidError:
         return {"msg":"Level invalido, o valor deve ser Iniciante,Intermediario ou Avançado"},400
 
 @jwt_required()
 def get_skill():
     user = get_jwt_identity()
-    skills = SkillModel.query.get_by("user_id" == user.id)
-    return jsonify(skills),200
+    id=user["id"]
+    skills = (SkillModel.query.filter(SkillModel.user_id==id))
+    serializer = [{"id":skill.id,
+     "skill": skill.skill,
+     "level": skill.level}for skill in skills]
+    return jsonify(serializer),200
 
     
 
 
 def atualize_skill(id):
-    data = request.get_json()
-    session = current_app.db.session 
+    try:
+        data:dict = request.get_json()
+        session = current_app.db.session 
 
-    skill = SkillModel.query.get(id)
-    if skill == None:
-        return{"msg": "skill não existente"},404
+        skill = SkillModel.query.get(id)
+        if skill == None:
+            return{"msg": "skill não existente"},404
 
-    for key, value in data.items():
-        if key == "skill" or key == "level":
-            setattr(skill, key, value)
+        for key, value in data.items():
+            if key == "skill" or key == "level":
+                setattr(skill, key, value)
 
-    session.add(skill)
-    session.commit()
-    return jsonify(skill), 200
+        session.add(skill)
+        session.commit()
+        return jsonify(skill), 200
+    except LevelInvalidError:
+        return {"msg":"Level invalido, o valor deve ser Iniciante,Intermediario ou Avançado"},400
+
 
 
 
