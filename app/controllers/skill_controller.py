@@ -1,10 +1,8 @@
-from flask_jwt_extended import get_jwt_identity,jwt_required
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask import request, current_app, jsonify
 from ..models.skill_model import SkillModel
 from psycopg2 import IntegrityError
 from ..exceptions import LevelInvalidError
-
-
 
 
 def create_skill():
