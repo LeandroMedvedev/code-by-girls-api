@@ -9,11 +9,10 @@ from psycopg2.errors import NotNullViolation
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.exceptions import InvalidDataError
+from app.exceptions import IdNotFoundError, InvalidDataError
 from app.models import GroupModel
-
-# from app.models import UserModel
 from app.services import check_data
+from app.services import get_by_id
 
 
 @jwt_required()
@@ -30,13 +29,10 @@ def create_group():
 
     try:
         get_user: dict = get_jwt_identity()
-        data.update({"user_id": get_user["id"]})
+        data["user_id"] = get_user["id"]
 
         group: GroupModel = GroupModel(**data)
-        # user: UserModel = UserModel.query.filter_by(id=get_user["id"]).first()
-        # print(f"{user=}")
-        # print(f"{group.users.append(user)=}")
-        # group.users.append(user)
+
         session: Session = current_app.db.session
         session.add(group)
         session.commit()
@@ -57,32 +53,59 @@ def create_group():
 @jwt_required()
 def get_groups():
     groups: GroupModel = GroupModel.query.all()
-    group: GroupModel = get_jwt_identity()
-    print(f"{group=}")
 
     return jsonify(groups), HTTPStatus.OK
 
 
 @jwt_required()
+def get_group_by_id(id):
+    try:
+        group = get_by_id(GroupModel, id)
+    except IdNotFoundError:
+        return {"error": "Group not found"}, HTTPStatus.NOT_FOUND
+
+    return jsonify(group), HTTPStatus.OK
+
+
+@jwt_required()
 def update_group(id: int):
+    try:
+        group = get_by_id(GroupModel, id)
 
-    group: GroupModel = GroupModel.query.filter_by(id=id).first()
-    print(f"{group=}")
-    # if not group:
-    #     return {'error': 'Group not found'}, HTTPStatus.NOT_FOUND
+        data: dict = request.get_json()
 
-    data: dict = request.get_json()
-    print(f"{data=}")
-    # valid_keys = {'name', "description"}
-    # received_keys = set(data.keys())
-    # invalid_keys
-    updated_group = GroupModel(**data)
-    print(f"{updated_group=}")
+        received_keys, valid_keys, invalid_keys = check_data(data)
 
-    return "", HTTPStatus.OK
+        data["name"] = data["name"].title()
+        data["description"] = data["description"].capitalize()
+
+        for key, value in data.items():
+            setattr(group, key, value)
+
+        session: Session = current_app.db.session
+        session.commit()
+    except IdNotFoundError:
+        return {"error": "Group not found"}, HTTPStatus.NOT_FOUND
+    except KeyError:
+        return {
+            "invalid_keys": list(invalid_keys),
+            "valid_keys": list(valid_keys),
+        }, HTTPStatus.BAD_REQUEST
+    except AttributeError:
+        return {"error": "Values must be of type string"}, HTTPStatus.BAD_REQUEST
+
+    return jsonify(group), HTTPStatus.OK
 
 
 @jwt_required()
 def delete_group(id: int):
+    try:
+        group = get_by_id(GroupModel, id)
+    except IdNotFoundError:
+        return {"error": "Group not found"}, HTTPStatus.NOT_FOUND
+
+    session: Session = current_app.db.session
+    session.delete(group)
+    session.commit()
 
     return "", HTTPStatus.NO_CONTENT

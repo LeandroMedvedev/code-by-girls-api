@@ -6,3 +6,6 @@ class LevelInvalidError(Exception):
 
 class InvalidDataError(Exception):
     pass
+
+class IdNotFoundError(Exception):
+    pass
