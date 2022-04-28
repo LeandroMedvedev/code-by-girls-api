@@ -30,6 +30,19 @@ def get_groups():
 # @jwt_required()
 def update_group(id: int):
 
+    group: GroupModel = GroupModel.query.filter_by(id=id).first()
+    print(f'{group=}')
+    # if not group:
+    #     return {'error': 'Group not found'}, HTTPStatus.NOT_FOUND
+    
+    data: dict = request.get_json()
+    print(f'{data=}')
+    # valid_keys = {'name', "description"}
+    # received_keys = set(data.keys())
+    # invalid_keys
+    updated_group = GroupModel(**data)
+    print(f'{updated_group=}')
+
     return '', HTTPStatus.OK
 
 # @jwt_required()
