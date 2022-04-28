@@ -12,7 +12,7 @@ def check_data(data: dict):
     return received_keys, valid_keys, invalid_keys
 
 
-def get_by_id(model, id: int):
+def get_by_id(model: object, id: int):
     session: Session = current_app.db.session
 
     query = session.query(model).get(id)

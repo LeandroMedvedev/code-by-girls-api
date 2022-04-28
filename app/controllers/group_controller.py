@@ -54,11 +54,22 @@ def create_group():
 def get_groups():
     groups: GroupModel = GroupModel.query.all()
 
-    return jsonify(groups), HTTPStatus.OK
+    serialized_groups = [
+        {
+            "id": group.id,
+            "name": group.name,
+            "description": group.description,
+        }
+        for group in groups
+    ]
+
+    # return {"groups": serialized_groups}, HTTPStatus.OK
+    return jsonify(serialized_groups), HTTPStatus.OK
+
 
 
 @jwt_required()
-def get_group_by_id(id):
+def get_group_by_id(id: int):
     try:
         group = get_by_id(GroupModel, id)
     except IdNotFoundError:
