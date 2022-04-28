@@ -1,11 +1,14 @@
 from http import HTTPStatus
+
 from app.configs.database import db
 from app.models.work_model import WorkModel
 from flask import jsonify, request
-from sqlalchemy.orm.session import Session
+from flask_jwt_extended import jwt_required
 from sqlalchemy.orm import Query
+from sqlalchemy.orm.session import Session
 
 
+@jwt_required()
 def create_work():
     data = request.get_json()
 
@@ -21,7 +24,6 @@ def get_work():
     works: Query =db.session.query(WorkModel).all()
 
     return jsonify(works), HTTPStatus.OK
-
 
 def delete_work(work_id):
 
@@ -46,4 +48,3 @@ def patch_work(work_id):
     session.commit()
 
     return jsonify(work_changed),HTTPStatus.OK
-
