@@ -1,23 +1,15 @@
 from datetime import timedelta
 from http import HTTPStatus
 
-from flask import current_app, request
+from flask import request
 from flask_jwt_extended import create_access_token
-# from sqlalchemy.orm import Session
 
 from app.models import UserModel
 
 
 def login():
-    # session: Session = current_app.db.session
-
     data = request.get_json()
-    # new_data = {
-    #     "email": data["email"],
-    #     "password_hash": data["password"]
-    # }
 
-    # user: UserModel = session.query(UserModel).filter_by(email=data["email"]).first()
     user: UserModel = UserModel.query.filter_by(email=data["email"]).first()
 
     if not user:
