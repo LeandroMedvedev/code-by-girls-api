@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 2630643b521a
+Revision ID: 9de2d55f2317
 Revises: 
-Create Date: 2022-04-27 11:13:05.366389
+Create Date: 2022-04-28 13:42:34.971180
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '2630643b521a'
+revision = '9de2d55f2317'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -40,8 +40,7 @@ def upgrade():
     sa.Column('level', sa.String(length=50), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('skill')
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('works',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -53,10 +52,10 @@ def upgrade():
     )
     op.create_table('comments_users_groups',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=True),
-    sa.Column('group_id', sa.Integer(), nullable=True),
     sa.Column('comments', sa.Text(), nullable=True),
-    sa.Column('timestamp', sa.Date(), nullable=True),
+    sa.Column('timestamp', sa.DateTime(), nullable=True),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('group_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['group_id'], ['groups.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')

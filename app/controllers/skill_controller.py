@@ -1,54 +1,87 @@
+from http import HTTPStatus
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask import request, current_app, jsonify
-from ..models.skill_model import SkillModel
-from psycopg2 import IntegrityError
+from ..models import SkillModel
 from ..exceptions import LevelInvalidError
 
 
+@jwt_required()
 def create_skill():
     try:
         session = current_app.db.session
         data = request.get_json()
         user = get_jwt_identity()
-        level = data.pop["level"]
-        data["user_id"]=user.id
-        data["level_id"] = level
+        data["user_id"]=user["id"]
         skill = SkillModel(**data)
         session.add(skill)
         session.commit()
-        return jsonify(skill),201
-    except IntegrityError:
-        return{"msg": "skill ja existente"},409
-    except LevelInvalidError:
-        return {"msg":"Level invalido, o valor deve ser Iniciante,Intermediario ou Avançado"},400
+        return jsonify(skill),HTTPStatus.CREATED
+    except TypeError:
+        return{"msg":{"valid_keys":
+        {"skill":"","level":""},
+        "your_keys":data}},HTTPStatus.BAD_REQUEST
 
-@jwt_required
+    except LevelInvalidError:
+        return {"msg":"Invalid level, value must be: Iniciante,Intermediario ou Avançado"},HTTPStatus.BAD_REQUEST
+
+@jwt_required()
 def get_skill():
     user = get_jwt_identity()
-    skills = SkillModel.query.get_by("user_id" == user.id)
-    return jsonify(skills),200
+    id=user["id"]
+    skills = (SkillModel.query.filter(SkillModel.user_id==id))
+    serializer = [{"id":skill.id,
+     "skill": skill.skill,
+     "level": skill.level}for skill in skills]
+    return jsonify(serializer),HTTPStatus.OK
 
-    
-@jwt_required
-def atualize_skill(id):
-    user = get_jwt_identity()
-    data = request.get_json()
-    session = current_app.db.session 
-    skill = SkillModel.query.get(id)
+
+def get_skill_id(id):
+    skill = (SkillModel.query.get(id))
     if skill == None:
-        return{"msg": "skill não existente"},404
-    for key, value in data.items():
-        setattr(skill, key, value)
-    session.add(skill)
-    session.commit()
-    return jsonify(skill), 200
+            return{"msg": "Non-existent skill"},HTTPStatus.NOT_FOUND
+    return jsonify(skill),HTTPStatus.OK
+    
 
-@jwt_required
+@jwt_required()
+def atualize_skill(id):
+   
+    try:
+        data:dict = request.get_json()
+        session = current_app.db.session 
+        user = get_jwt_identity()
+        skill = SkillModel.query.get(id)
+        if skill == None:
+            return{"msg": "Non-existent skill"},HTTPStatus.NOT_FOUND
+        if user["id"]!= skill.user_id:
+            print(user["id"])
+            print(skill.user_id)
+            print(skill)
+            print(user)
+            return{"msg": "It is possible to update only your skills"},HTTPStatus.BAD_REQUEST
+
+        for key, value in data.items():
+            if key == "skill" or key == "level":
+                setattr(skill, key, value)
+
+        session.add(skill)
+        session.commit()
+        return jsonify(skill), HTTPStatus.OK
+    except LevelInvalidError:
+        return {"msg":"Invalid level, value must be: Iniciante,Intermediario ou Avançado"},HTTPStatus.BAD_REQUEST
+
+
+
+
+@jwt_required()
 def delete_skill(id):  
     skill = SkillModel.query.get(id)
     session = current_app.db.session
+    user = get_jwt_identity()
     if skill == None:
-        return{"msg": "skill não existente"},404
+        return{"msg": "Non-existent skill"},HTTPStatus.NOT_FOUND
+    if user["id"] != skill.user_id:
+        return{"msg": "It is possible to delete only your skills"},HTTPStatus.BAD_REQUEST
+        
     session.delete(skill)
     session.commit()
-    return "", 204
+    return "", HTTPStatus.NO_CONTENT
