@@ -1,7 +1,7 @@
 from flask import Blueprint
 from flask import Flask
 
-from .group_route import bp as bp_group
+from .group_blueprint import bp as bp_group
 from .login_blueprint import bp_login
 from .user_blueprint import bp_user
 from .work_blueprint import bp_work
