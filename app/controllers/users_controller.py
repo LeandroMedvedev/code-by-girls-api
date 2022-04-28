@@ -1,11 +1,13 @@
-from flask import current_app, request, jsonify
-from app.models.user_model import UserModel
 from http import HTTPStatus
+
+from app.exceptions import InvalidEmailError
+from app.models.user_model import UserModel
+from flask import current_app, jsonify, request
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from psycopg2.errors import UniqueViolation
 from sqlalchemy.exc import IntegrityError
-from app.exceptions import InvalidEmailError
-from sqlalchemy.orm import Session, Query
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from sqlalchemy.orm import Query, Session
+
 
 def create_user():
     try:
