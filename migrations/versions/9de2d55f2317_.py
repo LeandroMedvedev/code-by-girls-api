@@ -48,8 +48,7 @@ def upgrade():
     sa.Column('description', sa.Text(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('title')
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('comments_users_groups',
     sa.Column('id', sa.Integer(), nullable=False),
