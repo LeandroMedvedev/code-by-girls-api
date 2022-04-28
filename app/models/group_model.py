@@ -1,10 +1,12 @@
 from dataclasses import dataclass
 
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm import validates
 from sqlalchemy.sql.schema import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import Integer, Text, VARCHAR
 
 from app.configs import db
+from app.exceptions import InvalidDataError
 from .user_group_table import users_groups_table
 
 
@@ -21,3 +23,17 @@ class GroupModel(db.Model):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
     users = relationship("UserModel", secondary=users_groups_table, backref="groups")
+
+    @validates("name")
+    def name_title(self, key: str, value: str):
+        if type(value) != str:
+            raise InvalidDataError
+
+        return value.title()
+
+    @validates("description")
+    def description_capitalize(self, key: str, value: str):
+        if type(value) != str:
+            raise InvalidDataError
+
+        return value.capitalize()
