@@ -13,6 +13,7 @@ from app.exceptions import IdNotFoundError
 from app.exceptions import InvalidDataError
 from app.exceptions import UserUnauthorizedError
 from app.models import GroupModel
+from app.models.user_model import UserModel
 from app.services import check_data
 from app.services import get_by_id
 from app.services import is_authorized
@@ -31,10 +32,14 @@ def create_group():
         }, HTTPStatus.BAD_REQUEST
 
     try:
-        get_user: dict = get_jwt_identity()
-        data["user_id"] = get_user["id"]
+        user_auth: dict = get_jwt_identity()
+        data["user_id"] = user_auth["id"]
 
         group: GroupModel = GroupModel(**data)
+
+        user: UserModel = UserModel.query.filter_by(id=user_auth["id"]).first()
+
+        group.users.append(user)
 
         session: Session = current_app.db.session
         session.add(group)
