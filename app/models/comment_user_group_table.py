@@ -9,6 +9,7 @@ from app.configs import db
 
 @dataclass
 class CommentUserGroupModel(db.Model):
+    id: int
     comments: str
     timestamp: str
 
@@ -18,7 +19,5 @@ class CommentUserGroupModel(db.Model):
     comments = Column(Text)
     timestamp = Column(DateTime, default=datetime.now)
 
-    user_id = Column(Integer,ForeignKey('users.id'),nullable=False)
-    group_id = Column(Integer,ForeignKey('groups.id'),nullable=False)
-
-
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    group_id = Column(Integer, ForeignKey('groups.id'), nullable=False)
