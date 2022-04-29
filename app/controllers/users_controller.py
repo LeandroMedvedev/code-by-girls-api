@@ -1,7 +1,8 @@
 from http import HTTPStatus
 
-from app.exceptions import InvalidEmailError
+from app.exceptions import InvalidEmailError, IdNotFoundError
 from app.models.user_model import UserModel
+from app.services import get_by_id, check_user_data, check_mandatory_keys, normalize_data, check_value_type
 from flask import current_app, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from psycopg2.errors import UniqueViolation
@@ -10,8 +11,27 @@ from sqlalchemy.orm import Query, Session
 
 
 def create_user():
+    data = request.get_json()
+
+    received_keys, valid_keys, invalid_keys = check_user_data(data)
+
+    if invalid_keys:
+        return {
+            "invalid_keys": list(invalid_keys),
+            "valid_keys": list(valid_keys),
+        }, HTTPStatus.BAD_REQUEST
+
+    if check_mandatory_keys(data):
+        return {
+            "error": "name, email and password are mandatory keys"
+        }, HTTPStatus.BAD_REQUEST
+    
+    if check_value_type(data):
+        return {"error": "all values must be strings"}, HTTPStatus.BAD_REQUEST
+
+
     try:
-        data = request.get_json()
+        normalize_data(data)
         session : Session = current_app.db.session
 
         new_user =  UserModel(**data)
@@ -93,3 +113,12 @@ def delete_user(id):
         return "", HTTPStatus.NO_CONTENT
     except:
         return {"error": "error"}, HTTPStatus.BAD_REQUEST
+
+@jwt_required()
+def get_user_by_id(id):
+    try:
+        user = get_by_id(UserModel, id)
+    except IdNotFoundError:
+        return {"error": "User not found"}, HTTPStatus.NOT_FOUND
+
+    return jsonify(user), HTTPStatus.OK
