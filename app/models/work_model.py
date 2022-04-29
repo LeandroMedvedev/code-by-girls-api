@@ -9,13 +9,12 @@ from sqlalchemy.sql.sqltypes import Integer, String, Text
 class WorkModel(db.Model):
     title: str
     description: str
-    user_id:int
+    user_id: int
 
-    __tablename__ = "works"
+    __tablename__ = 'works'
 
     id = Column(Integer, primary_key=True)
     title = Column(String(50), nullable=False, unique=True)
-    description = Column(Text,nullable=False)
-    
-    user_id = Column(Integer,ForeignKey('users.id'),nullable=False)
-    
+    description = Column(Text, nullable=False)
+
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
