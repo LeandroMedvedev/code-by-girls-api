@@ -13,5 +13,5 @@ def init_app(app: Flask):
     from app.models import SkillModel
     from app.models import UserModel
     from app.models import WorkModel
-    from app.models import comments_users_groups_table
+    from app.models import comment_user_group_table
     from app.models import users_groups_table
