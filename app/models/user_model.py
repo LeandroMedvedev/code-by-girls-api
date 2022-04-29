@@ -7,47 +7,41 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.configs import db
 from app.exceptions import InvalidEmailError
+from .user_group_table import users_groups_table
 
 
 @dataclass
 class UserModel(db.Model):
-
-    id:int
-    name:str
-    email:str
-    skills:list
-    works:list
+    id: int
+    name: str
+    email: str
+    skills: list
+    works: list
 
     __tablename__ = "users"
 
-
-    id = Column(Integer, primary_key = True)
-    name = Column(String(50), nullable = False)
-    email = Column(String(100), nullable = False, unique = True)
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), nullable=False)
+    email = Column(String(100), nullable=False, unique=True)
     password_hash = Column(String)
 
     skills = relationship("SkillModel", backref="user")
     works = relationship("WorkModel", backref="user")
 
-
     @validates("email")
     def validate_email(self, key, email):
         if "@" not in email or not email.endswith(".com"):
             raise InvalidEmailError
-        
-        return email
-            
-    
+
+        return email.lower()
+
     @property
     def password(self):
         raise AttributeError("Password cannot be accessed!")
-
 
     @password.setter
     def password(self, password_to_hash):
         self.password_hash = generate_password_hash(password_to_hash)
 
-
     def verify_password(self, compare_to_password):
         return check_password_hash(self.password_hash, compare_to_password)
-        
