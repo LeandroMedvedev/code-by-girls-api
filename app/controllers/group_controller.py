@@ -9,10 +9,13 @@ from psycopg2.errors import NotNullViolation
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.exceptions import IdNotFoundError, InvalidDataError
+from app.exceptions import IdNotFoundError
+from app.exceptions import InvalidDataError
+from app.exceptions import UserUnauthorizedError
 from app.models import GroupModel
 from app.services import check_data
 from app.services import get_by_id
+from app.services import is_authorized
 
 
 @jwt_required()
@@ -54,7 +57,7 @@ def create_group():
 def get_groups():
     groups: GroupModel = GroupModel.query.all()
 
-    serialized_groups = [
+    data_groups = [
         {
             "id": group.id,
             "name": group.name,
@@ -63,9 +66,7 @@ def get_groups():
         for group in groups
     ]
 
-    # return {"groups": serialized_groups}, HTTPStatus.OK
-    return jsonify(serialized_groups), HTTPStatus.OK
-
+    return jsonify(data_groups), HTTPStatus.OK
 
 
 @jwt_required()
@@ -81,7 +82,9 @@ def get_group_by_id(id: int):
 @jwt_required()
 def update_group(id: int):
     try:
-        group = get_by_id(GroupModel, id)
+        group: GroupModel = get_by_id(GroupModel, id)
+
+        has_authorized: type = is_authorized(group.user_id)
 
         data: dict = request.get_json()
 
@@ -104,6 +107,10 @@ def update_group(id: int):
         }, HTTPStatus.BAD_REQUEST
     except AttributeError:
         return {"error": "Values must be of type string"}, HTTPStatus.BAD_REQUEST
+    except UserUnauthorizedError:
+        return {
+            "error": "Unauthorized update. You are only allowed to update groups created by you"
+        }, HTTPStatus.UNAUTHORIZED
 
     return jsonify(group), HTTPStatus.OK
 
@@ -111,9 +118,15 @@ def update_group(id: int):
 @jwt_required()
 def delete_group(id: int):
     try:
-        group = get_by_id(GroupModel, id)
+        group: GroupModel = get_by_id(GroupModel, id)
+
+        has_authorized: type = is_authorized(group.user_id)
     except IdNotFoundError:
         return {"error": "Group not found"}, HTTPStatus.NOT_FOUND
+    except UserUnauthorizedError:
+        return {
+            "error": "Unauthorized deletion. You are only allowed to delete groups created by you"
+        }, HTTPStatus.UNAUTHORIZED
 
     session: Session = current_app.db.session
     session.delete(group)

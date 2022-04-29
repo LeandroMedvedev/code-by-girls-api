@@ -18,7 +18,7 @@ class GroupModel(db.Model):
     __tablename__ = "groups"
 
     id = Column(Integer, primary_key=True)
-    name = Column(VARCHAR(50), nullable=False)
+    name = Column(VARCHAR(50), nullable=False, unique=True)
     description = Column(Text, nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
