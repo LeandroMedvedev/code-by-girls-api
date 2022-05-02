@@ -23,7 +23,10 @@ def get_all():
 
 @jwt_required()
 def get_by_id(id: int):
-    ...
+    comment = (CommentUserGroupModel.query.get(id))
+    if comment == None:
+            return{"msg": "Non-existent comment"},HTTPStatus.NOT_FOUND
+    return jsonify(comment),HTTPStatus.OK
 
 
 @jwt_required()
@@ -65,9 +68,39 @@ def created():
 
 @jwt_required()
 def update(id: int):
-    ...
+    
+        session: Session = current_app.db.session 
+        data:dict = request.get_json()
+        user = get_jwt_identity()
+        comment = CommentUserGroupModel.query.get(id)
+        
+        if comment == None:
+            return{"msg": "Non-existent comment"},HTTPStatus.NOT_FOUND
+        
+        if user["id"]!= comment.user_id:
+            return{"msg": "It is possible to update only your comments"},HTTPStatus.BAD_REQUEST
+
+        for key, value in data.items():
+            if key == "comments":
+                setattr(comment, key, value)
+
+                session.add(comment)
+                session.commit()
+                return jsonify(comment), HTTPStatus.OK
+            else:
+                return {"error": "You can only update the comments field"}, HTTPStatus.BAD_REQUEST
 
 
 @jwt_required()
 def delete(id: int):
-    ...
+    comment = CommentUserGroupModel.query.get(id)
+    session = current_app.db.session
+    user = get_jwt_identity()
+    if comment == None:
+        return{"msg": "Non-existent comment"},HTTPStatus.NOT_FOUND
+    if user["id"] != comment.user_id:
+        return{"msg": "It is possible to delete only your comments"},HTTPStatus.BAD_REQUEST
+        
+    session.delete(comment)
+    session.commit()
+    return "", HTTPStatus.NO_CONTENT

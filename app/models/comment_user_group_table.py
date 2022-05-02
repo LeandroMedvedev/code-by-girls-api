@@ -19,7 +19,7 @@ class CommentUserGroupModel(db.Model):
 
     id = Column(Integer, primary_key=True)
     comments = Column(Text)
-    timestamp = Column(DateTime, default=datetime.now)
+    timestamp = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     group_id = Column(Integer, ForeignKey('groups.id'), nullable=False)
