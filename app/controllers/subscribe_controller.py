@@ -59,66 +59,16 @@ def delete_subscribe(id: int):
     session: Session = current_app.db.session
     user_auth = get_jwt_identity()
 
-    query: Query = (
-        session
-        .query(GroupModel)
-        .select_from(users_groups_table)
-        .filter_by(user_id=user_auth["id"])
-        .filter_by(group_id=id)
-        .first()
-    )
+    try:
+        user: UserModel = UserModel.query.filter_by(id=user_auth["id"]).first()
 
-    print(query)
+        group: GroupModel = GroupModel.query.get(id)
 
-    # session.delete(query)
-    # session.commit()
+        group.users.remove(user)
 
-    # return "", HTTPStatus.NO_CONTENT
-    return jsonify(query)
+        session.commit()
 
-    # query: Query = (
-    #     session
-    #     .query(GroupModel)
-    #     .select_from(users_groups_table)
-    #     .filter_by(user_id=user_auth["id"])
-    #     .join(GroupModel)
-    #     .filter_by(id=id)
-    #     .join(UserModel)
-    #     .first()
-    # )
+    except ValueError:
+        return {"error": "user not found!"}, HTTPStatus.NOT_FOUND
 
-    # if query:
-    # groups: GroupModel = (
-    # session
-    # .query(GroupModel)
-    # .get(data["group_id"])
-    # )
-
-    # users = (
-    #     session
-    #     .query(UserModel)
-    #     .get(user_auth["id"])
-    # )
-
-    # groups.users.append(users)
-
-    # set_trace()
-
-    # for user in query.users:
-    #     if user.id == user_auth["id"]:
-    #         print(query.user.remove(user))
-
-    # session.commit()
-
-    # data = request.get_json()
-
-    # user: UserModel = UserModel.query.filter_by(id=user_auth["id"]).first()
-
-    # group: GroupModel = GroupModel.query.get(id)
-
-    # group.users.remove(user)
-
-    # print(teste)
-    # session.commit()
-
-    # return jsonify(group)
+    return jsonify(group)
