@@ -7,14 +7,15 @@ from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 from psycopg2.errors import NotNullViolation
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session, Query
+from sqlalchemy.orm import Query
+from sqlalchemy.orm import Session
 
 from app.exceptions import IdNotFoundError
 from app.exceptions import InvalidDataError
 from app.exceptions import UserUnauthorizedError
 from app.models import GroupModel
-from app.models.user_group_table import users_groups_table
-from app.models.user_model import UserModel
+from app.models import users_groups_table
+from app.models import UserModel
 from app.services import check_data
 from app.services import get_by_id
 from app.services import is_authorized
