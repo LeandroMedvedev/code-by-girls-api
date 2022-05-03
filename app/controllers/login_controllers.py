@@ -6,8 +6,11 @@ from flask import request
 from flask_jwt_extended import create_access_token
 
 
+
 def login():
     data = request.get_json()
+
+    data["email"] = data["email"].lower()
 
     user: UserModel = UserModel.query.filter_by(email=data["email"]).first()
 
