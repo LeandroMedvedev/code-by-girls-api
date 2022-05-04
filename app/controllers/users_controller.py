@@ -1,6 +1,7 @@
 from http import HTTPStatus
 from wsgiref import validate
 from flask_mail import Message
+from sqlalchemy import false
 
 from app.exceptions import InvalidEmailError, IdNotFoundError
 from app.models.user_model import UserModel
@@ -37,7 +38,7 @@ def create_user():
     try:
         normalize_data(data)
         session: Session = current_app.db.session
-
+        data["is_validate"] = False
         new_user = UserModel(**data)
 
         session.add(new_user)
@@ -131,17 +132,21 @@ def get_user_by_id(id):
 
 def confirm_email(token):
     session: Session = current_app.db.session
+    email = s.loads(token, salt='email-confirm', max_age=3600)
+
     user = (
         session
         .query(UserModel)
-        .filter_by(email=token)
+        .filter_by(email=email)
         .first()
     )
+    print(f"{user=}")
 
     setattr(user, "is_validate", True)
+
     session.commit()
 
-    return jsonify({"msg": "user verify!"}), HTTPStatus.OK
+    return "<h1>Email confirmado.</h1>"
 
 
 def validates_email(email):
