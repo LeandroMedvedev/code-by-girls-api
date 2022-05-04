@@ -8,7 +8,7 @@ A aplicação foi pensada para fomentar a troca de experiências, divulgação d
 
 Há um total de 28 endpoints.
 
-#### **Method                  |               Endpoint**
+#### **Method | Endpoint**
 
 * POST     /api/users  
 * GET      /api/users  
