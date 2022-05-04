@@ -8,7 +8,7 @@ A aplicação foi pensada para fomentar a troca de experiências, divulgação d
 
 Há um total de 28 endpoints.
 
-#### **Method                  |               Endpoint**
+#### **Method | Endpoint**
 
 * POST     /api/users  
 * GET      /api/users  
@@ -455,13 +455,25 @@ No body
 ***  
 ## **Groups Subscribes**   
 
+![Matheus Serafim](https://avatars.githubusercontent.com/u/77494384?s=32&v=4)  
+Matheus Serafim - Scrum Master    
 
+![Marta Lima](https://avatars.githubusercontent.com/u/88337182?s=32&v=4)  
+Marta Lima - Product Owner  
 
+![Miguel Leite](https://avatars.githubusercontent.com/u/88355609?s=32&v=4)  
+Miguel Leite - Quality Assurance  
 
+![Jonatas Heiderich](https://avatars.githubusercontent.com/u/91901328?s=32&v=4)  
+Jonatas Heiderich - Quality Assurance  
 
+![Samuel Manga]()  
+Samuel Manga - Quality Assurance  
 
+![Leandro Medvedev](https://avatars.githubusercontent.com/u/88355581?s=32&v=4)  
+Leandro Medvedev - Tech Lead   
 
+##### **Made with python_passion. We hope you like it.**  🙋🏽
+##### **3rd May 2022, Brazil**  
 
-
-
-![GitHub followers](https://img.shields.io/github/followers/leandromedvedev?style=social)
+![GitHub followers](https://img.shields.io/github/followers/leandromedvedev?style=social)  
