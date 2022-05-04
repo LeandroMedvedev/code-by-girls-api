@@ -1,8 +1,10 @@
 alembic==1.7.7
 appdirs==1.4.4
 asttokens==2.0.5
+autopep8==1.6.0
 backcall==0.2.0
 black==21.7b0
+blinker==1.4
 blue==0.8.0
 click==8.1.2
 decorator==5.1.1
@@ -13,6 +15,7 @@ flake8==4.0.1
 Flask==2.1.1
 Flask-HTTPAuth==4.5.0
 Flask-JWT-Extended==4.3.1
+Flask-Mail==0.9.1
 Flask-Migrate==3.1.0
 flask-shell-ipython==0.4.1
 Flask-SQLAlchemy==2.5.1
@@ -36,7 +39,6 @@ parso==0.8.3
 pathspec==0.9.0
 pexpect==4.8.0
 pickleshare==0.7.5
-pip-autoremove==0.10.0
 platformdirs==2.5.2
 prompt-toolkit==3.0.29
 psycopg2-binary==2.9.3

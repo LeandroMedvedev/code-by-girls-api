@@ -40,11 +40,9 @@ def subscribes():
         .get(data["group_id"])
     )
 
-    users = (
-        session
-        .query(UserModel)
-        .get(user_auth["id"])
-    )
+    users = UserModel.query.get(user_auth["id"])
+
+    print(f"\n{users=}")
 
     groups.users.append(users)
 
@@ -60,12 +58,13 @@ def delete_subscribe(id: int):
     user_auth = get_jwt_identity()
 
     try:
-        user: UserModel = UserModel.query.filter_by(id=user_auth["id"]).first()
+        user: UserModel = UserModel.query.get(user_auth["id"])
 
         group: GroupModel = GroupModel.query.get(id)
 
         group.users.remove(user)
 
+        session.add(group)
         session.commit()
 
     except ValueError:
