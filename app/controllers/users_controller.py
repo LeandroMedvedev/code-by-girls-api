@@ -2,8 +2,13 @@ from http import HTTPStatus
 
 from app.exceptions import IdNotFoundError, InvalidEmailError
 from app.models.user_model import UserModel
-from app.services import (check_mandatory_keys, check_user_data,
-                          check_value_type, get_by_id, normalize_data)
+from app.services import (
+    check_mandatory_keys,
+    check_user_data,
+    check_value_type,
+    get_by_id,
+    normalize_data,
+)
 from flask import current_app, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from psycopg2.errors import UniqueViolation
@@ -18,22 +23,21 @@ def create_user():
 
     if invalid_keys:
         return {
-            "invalid_keys": list(invalid_keys),
-            "valid_keys": list(valid_keys),
+            'invalid_keys': list(invalid_keys),
+            'valid_keys': list(valid_keys),
         }, HTTPStatus.BAD_REQUEST
 
     if check_mandatory_keys(data):
         return {
-            "error": "name, email and password are mandatory keys"
+            'error': 'name, email and password are mandatory keys'
         }, HTTPStatus.BAD_REQUEST
-    
-    if check_value_type(data):
-        return {"error": "all values must be strings"}, HTTPStatus.BAD_REQUEST
 
+    if check_value_type(data):
+        return {'error': 'all values must be strings'}, HTTPStatus.BAD_REQUEST
 
     try:
         normalize_data(data)
-        session : Session = current_app.db.session
+        session: Session = current_app.db.session
 
         new_user = UserModel(**data)
 
@@ -48,11 +52,7 @@ def create_user():
     except IntegrityError as e:
         if type(e.orig) == UniqueViolation:
 
-<<<<<<< HEAD
-            return {'error': 'EMAIL is alredy exists'}, HTTPStatus.CONFLICT
-=======
-            return {"error": "Email is already exists"}, HTTPStatus.CONFLICT
->>>>>>> 574efe147de2d77a280333282bddf31e222d395c
+            return {'error': 'Email is already exists'}, HTTPStatus.CONFLICT
 
 
 @jwt_required()
@@ -87,11 +87,9 @@ def att_user(id):
         return jsonify(user), HTTPStatus.OK
 
     except:
-<<<<<<< HEAD
-        return {'error': 'error'}, HTTPStatus.BAD_REQUEST
-=======
-        return {"invalid_email": "Past email should have a format similar to:  something@something.com"}, HTTPStatus.BAD_REQUEST
->>>>>>> 574efe147de2d77a280333282bddf31e222d395c
+        return {
+            'invalid_email': 'Past email should have a format similar to:  something@something.com'
+        }, HTTPStatus.BAD_REQUEST
 
 
 @jwt_required()
@@ -115,13 +113,14 @@ def delete_user(id):
 
         return '', HTTPStatus.NO_CONTENT
     except:
-        return {"error": "error"}, HTTPStatus.BAD_REQUEST
+        return {'error': 'error'}, HTTPStatus.BAD_REQUEST
+
 
 @jwt_required()
 def get_user_by_id(id):
     try:
         user = get_by_id(UserModel, id)
     except IdNotFoundError:
-        return {"error": "User not found"}, HTTPStatus.NOT_FOUND
+        return {'error': 'User not found'}, HTTPStatus.NOT_FOUND
 
     return jsonify(user), HTTPStatus.OK

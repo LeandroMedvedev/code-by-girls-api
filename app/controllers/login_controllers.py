@@ -6,23 +6,22 @@ from flask import request
 from flask_jwt_extended import create_access_token
 
 
-
 def login():
     data = request.get_json()
 
-    data["email"] = data["email"].lower()
+    data['email'] = data['email'].lower()
 
-    user: UserModel = UserModel.query.filter_by(email=data["email"]).first()
+    user: UserModel = UserModel.query.filter_by(email=data['email']).first()
 
     if not user:
-        return {"error": "User not found!"}, HTTPStatus.NOT_FOUND
+        return {'error': 'User not found!'}, HTTPStatus.NOT_FOUND
 
-    if user.verify_password(data["password"]):
-        data = {"id": user.id, "name": user.name, "email": user.email}
+    if user.verify_password(data['password']):
+        data = {'id': user.id, 'name': user.name, 'email': user.email}
 
         accessToken = create_access_token(
             identity=data, expires_delta=timedelta(days=1)
         )
-        return {"token": accessToken, "user": data}, HTTPStatus.OK
+        return {'token': accessToken, 'user': data}, HTTPStatus.OK
     else:
-        return {"error": "Unauthorized"}, HTTPStatus.UNAUTHORIZED
+        return {'error': 'Unauthorized'}, HTTPStatus.UNAUTHORIZED

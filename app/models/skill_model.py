@@ -7,9 +7,9 @@ from app.configs import db
 
 @dataclass
 class SkillModel(db.Model):
-    id:int
-    skill : str
-    level : str
+    id: int
+    skill: str
+    level: str
 
     __tablename__ = 'skills'
 

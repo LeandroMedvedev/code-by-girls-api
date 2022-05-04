@@ -28,7 +28,7 @@ class UserModel(db.Model):
     skills = relationship('SkillModel', backref='user')
     works = relationship('WorkModel', backref='user')
 
-    @validates("email")
+    @validates('email')
     def validate_email(self, key, email):
         if '@' not in email or not email.endswith('.com'):
             raise InvalidEmailError
@@ -37,7 +37,7 @@ class UserModel(db.Model):
 
     @property
     def password(self):
-        raise AttributeError("Password cannot be accessed!")
+        raise AttributeError('Password cannot be accessed!')
 
     @password.setter
     def password(self, password_to_hash):
