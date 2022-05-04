@@ -456,12 +456,25 @@ No body
 ## **Groups Subscribes**   
 
 
+![Matheus Serafim](https://ca.slack-edge.com/TQZR39SET-U026CAZ930X-5a167a39d01e-72)
+Matheus Serafim - Scrum Master    
 
+![Marta Lima](https://ca.slack-edge.com/TQZR39SET-U025P2EM6H0-06eb33c8dd24-72)
+Marta Lima - Product Owner  
 
+![Samuel Manga](https://ca.slack-edge.com/TQZR39SET-U02238SA57T-b0ce27e1280c-72)
+Samuel Manga - Quality Assurance  
 
+![Jonatas Heiderich](https://ca.slack-edge.com/TQZR39SET-U0296JV7Q1W-e311388e0fe9-72)
+Jonatas Heiderich - Quality Assurance 
 
+![Miguel Leite](https://ca.slack-edge.com/TQZR39SET-U0248D5N77Z-19d92cc5508a-72)
+Miguel Leite - Quality Assurance 
 
+![Leandro Medvedev](https://ca.slack-edge.com/TQZR39SET-U025R1QC6HY-f5f3584c7726-72)
+Leandro Medvedev - Tech Leader  
 
+##### **Made with python_passion. We hope you like it.**  🙋🏽
+##### **3rd May 2022, Brazil**
 
-
-![GitHub followers](https://img.shields.io/github/followers/leandromedvedev?style=social)
+![GitHub followers](https://img.shields.io/github/followers/leandromedvedev?style=social)  
