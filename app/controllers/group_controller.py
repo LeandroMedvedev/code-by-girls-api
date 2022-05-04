@@ -39,13 +39,14 @@ def create_group():
 
         group: GroupModel = GroupModel(**data)
 
-        user: UserModel = UserModel.query.filter_by(id=user_auth["id"]).first()
+        # user: UserModel = UserModel.query.filter_by(id=user_auth["id"]).first()
 
-        group.users.append(user)
+        # group.users.append(user)
 
         session: Session = current_app.db.session
         session.add(group)
         session.commit()
+
     except IntegrityError as err:
         if isinstance(err.orig, NotNullViolation):
             return {

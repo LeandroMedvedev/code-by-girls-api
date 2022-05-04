@@ -1,8 +1,9 @@
 from dataclasses import dataclass
+from enum import unique
 
 from sqlalchemy.orm import validates, relationship
 from sqlalchemy.sql.schema import Column
-from sqlalchemy.sql.sqltypes import Integer, String
+from sqlalchemy.sql.sqltypes import Integer, String, Boolean
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.configs import db
@@ -23,6 +24,7 @@ class UserModel(db.Model):
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False)
     email = Column(String(100), nullable=False, unique=True)
+    is_validate = Column(Boolean, default=False)
     password_hash = Column(String)
 
     skills = relationship("SkillModel", backref="user")

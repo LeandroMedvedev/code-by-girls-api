@@ -18,6 +18,9 @@ def login():
         if not user:
             return {"error": "User not found!"}, HTTPStatus.NOT_FOUND
 
+        if not user.is_validate:
+            return {"error": "email not validate!"}, HTTPStatus.BAD_REQUEST
+
         if user.verify_password(data["password"]):
             data = {"id": user.id, "name": user.name, "email": user.email}
 
