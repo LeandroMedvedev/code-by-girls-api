@@ -48,7 +48,11 @@ def create_user():
     except IntegrityError as e:
         if type(e.orig) == UniqueViolation:
 
+<<<<<<< HEAD
             return {'error': 'EMAIL is alredy exists'}, HTTPStatus.CONFLICT
+=======
+            return {"error": "Email is already exists"}, HTTPStatus.CONFLICT
+>>>>>>> 574efe147de2d77a280333282bddf31e222d395c
 
 
 @jwt_required()
@@ -83,7 +87,11 @@ def att_user(id):
         return jsonify(user), HTTPStatus.OK
 
     except:
+<<<<<<< HEAD
         return {'error': 'error'}, HTTPStatus.BAD_REQUEST
+=======
+        return {"invalid_email": "Past email should have a format similar to:  something@something.com"}, HTTPStatus.BAD_REQUEST
+>>>>>>> 574efe147de2d77a280333282bddf31e222d395c
 
 
 @jwt_required()
