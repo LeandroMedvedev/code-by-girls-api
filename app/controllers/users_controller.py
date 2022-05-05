@@ -16,6 +16,7 @@ from sqlalchemy.orm import Session
 from app.exceptions import IdNotFoundError
 from app.exceptions import InvalidEmailError
 from app.models import UserModel
+from app.models import users_groups_table
 from app.services import check_mandatory_keys
 from app.services import check_user_data
 from app.services import check_value_type
@@ -106,7 +107,7 @@ def att_user(id):
 
 @jwt_required()
 def delete_user(id):
-    # try:
+
     session: Session = current_app.db.session
     user_auth = get_jwt_identity()
 
@@ -117,13 +118,20 @@ def delete_user(id):
     if not user:
         return {'error': 'id not found'}, HTTPStatus.NOT_FOUND
 
-    session.delete(user)
-    session.commit()
+    group_owner: Query = (
+        session.query(users_groups_table)
+        .filter_by(user_id=user_auth['id'])
+        .first()
+    )
+    if not group_owner:
+        session.delete(user)
+        session.commit()
+    else:
+        return {
+            'error': 'Before deleting your account, delete the groups associated with it'
+        }, HTTPStatus.UNPROCESSABLE_ENTITY
 
-    return ""
-    # return '', HTTPStatus.NO_CONTENT
-    # except:
-    #     return {'error': 'error'}, HTTPStatus.BAD_REQUEST
+    return '', HTTPStatus.NO_CONTENT
 
 
 @jwt_required()
