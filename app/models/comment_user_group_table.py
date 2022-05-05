@@ -21,9 +21,9 @@ class CommentUserGroupModel(db.Model):
     timestamp = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
     user_id = Column(Integer, ForeignKey(
-        'users.id', ondelete='CASCADE'), nullable=False)
+        'users.id', ondelete='CASCADE'))
     group_id = Column(Integer, ForeignKey(
-        'groups.id', ondelete='CASCADE'), nullable=False)
+        'groups.id', ondelete='CASCADE'))
 
     user = db.relationship(
         'UserModel', backref='comments')
