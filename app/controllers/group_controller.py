@@ -17,6 +17,7 @@ from sqlalchemy.orm import Query, Session
 @jwt_required()
 def create_group():
     data: dict = request.get_json()
+    print(f'{data=}')
 
     received_keys, valid_keys, invalid_keys = check_data(data)
 
@@ -29,8 +30,10 @@ def create_group():
     try:
         user_auth: dict = get_jwt_identity()
         data['user_id'] = user_auth['id']
+        print(f'{data=}')
 
         group: GroupModel = GroupModel(**data)
+        print(f'{group=}')
 
         user: UserModel = UserModel.query.filter_by(id=user_auth['id']).first()
 
@@ -130,7 +133,7 @@ def delete_group(id: int):
     #     if isinstance(e.orig, NotNullViolation):
     #         return {'error': 'Group not found'}, HTTPStatus.NOT_FOUND
 
-    return '', HTTPStatus.NO_CONTENT
+    return jsonify(group)
 
 
 # @jwt_required()

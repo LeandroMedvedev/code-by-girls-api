@@ -15,7 +15,9 @@ from sqlalchemy.orm import Session
 
 from app.exceptions import IdNotFoundError
 from app.exceptions import InvalidEmailError
+from app.models import GroupModel
 from app.models import UserModel
+from app.models import users_groups_table
 from app.services import check_mandatory_keys
 from app.services import check_user_data
 from app.services import check_value_type
@@ -55,7 +57,7 @@ def create_user():
 
         # validates_email(new_user.email)
 
-        return jsonify({"msg": "verify you email!"}), HTTPStatus.CREATED
+        return jsonify({'msg': 'verify you email!'}), HTTPStatus.CREATED
 
     except InvalidEmailError:
         return {'error': 'Error'}, HTTPStatus.BAD_REQUEST
@@ -98,7 +100,7 @@ def att_user(id):
 
     except:
         return {
-            'invalid_email': 'Past email should have a format similar to:  something@something.com'
+            'invalid_email': 'Past email should have a format similar to: something@something.com'
         }, HTTPStatus.BAD_REQUEST
 
 
@@ -107,22 +109,41 @@ def delete_user(id):
     # try:
     session: Session = current_app.db.session
     user_auth = get_jwt_identity()
+    print(f'{user_auth["id"]=}')
 
-    user: Query = (
-        session.query(UserModel).get(id)
-    )
+    user: Query = session.query(UserModel).get(id)
+    print(f'{user=}')
 
     if not user:
-        return {'error': 'id not found'}, HTTPStatus.NOT_FOUND
+        return {'error': 'User not found'}, HTTPStatus.NOT_FOUND
 
-    session.delete(user)
-    session.commit()
+    group_owner: Query = session.query(GroupModel).get(id)
+    # group_owner: Query = (
+    #     session.query(users_groups_table)
+    #     .filter_by(user_id=user_auth['id'])
+    #     .first()
+    # )
 
-    return ""
-    # return '', HTTPStatus.NO_CONTENT
+
+    print(f'{group_owner=}')
+    # if not group_owner:
+    #     session.delete(user)
+    #     session.commit()
+    #     print('EEEEEEEEEUUUUUUUU')
+    # else:
+    #     return {
+    #         'error': 'Before deleting your account, delete the groups associated with it'
+    #     }, HTTPStatus.UNPROCESSABLE_ENTITY
+
+    # return ''
+    return '', HTTPStatus.NO_CONTENT
     # except:
     #     return {'error': 'error'}, HTTPStatus.BAD_REQUEST
-
+    # group=[GroupModel(id=5, name='Mens 1', description='Mens group formmed',
+    # users=[UserModel(id=10, name='Leandro Medvedev', email='leandromedvedev@hotmail.com', skills=[], works=[])],
+    # user=UserModel(id=10, name='Leandro Medvedev', email='leandromedvedev@hotmail.com', skills=[], works=[]),
+    # remark=[])]
+    # print(f'{group=}')
 
 @jwt_required()
 def get_user_by_id(id):

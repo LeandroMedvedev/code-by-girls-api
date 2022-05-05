@@ -20,10 +20,11 @@ class CommentUserGroupModel(db.Model):
     comments = Column(Text)
     timestamp = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
-    user_id = Column(Integer, ForeignKey(
-        'users.id', ondelete='CASCADE'), nullable=False)
-    group_id = Column(Integer, ForeignKey(
-        'groups.id', ondelete='CASCADE'), nullable=False)
+    user_id = Column(
+        Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False
+    )
+    group_id = Column(
+        Integer, ForeignKey('groups.id', ondelete='CASCADE'), nullable=False
+    )
 
-    user = db.relationship(
-        'UserModel', backref='comments')
+    user = db.relationship('UserModel', backref='comments')
