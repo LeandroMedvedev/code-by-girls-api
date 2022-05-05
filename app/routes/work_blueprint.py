@@ -10,3 +10,5 @@ bp_work.get('')(work_controller.get_work)
 bp_work.patch('/<int:work_id>')(work_controller.patch_work)
 
 bp_work.delete('/<int:work_id>')(work_controller.delete_work)
+
+bp_work.get('/<int:work_id>')(work_controller.get_work_to_id)
