@@ -26,6 +26,7 @@ s = URLSafeTimedSerializer('Thisisasecret!')
 
 
 def create_user():
+
     data = request.get_json()
 
     received_keys, valid_keys, invalid_keys = check_user_data(data)
@@ -43,7 +44,6 @@ def create_user():
 
     if check_value_type(data):
         return {'error': 'all values must be strings'}, HTTPStatus.BAD_REQUEST
-
     try:
         normalize_data(data)
         session: Session = current_app.db.session
@@ -53,16 +53,15 @@ def create_user():
         session.add(new_user)
         session.commit()
 
-        validates_email(new_user.email)
+        # validates_email(new_user.email)
 
-        return jsonify(new_user), HTTPStatus.CREATED
+        return jsonify({"msg": "verify you email!"}), HTTPStatus.CREATED
 
     except InvalidEmailError:
         return {'error': 'Error'}, HTTPStatus.BAD_REQUEST
 
-    except IntegrityError as e:
-        if type(e.orig) == UniqueViolation:
-
+    except IntegrityError as err:
+        if isinstance(err.orig, UniqueViolation):
             return {'error': 'Email is already exists'}, HTTPStatus.CONFLICT
 
 
@@ -110,23 +109,19 @@ def delete_user(id):
     user_auth = get_jwt_identity()
 
     user: Query = (
-        session.query(UserModel)
-        .filter_by(id=user_auth['id'])
-        .filter_by(id=id)
-        .first()
+        session.query(UserModel).get(id)
     )
 
     if not user:
-        return {'error': 'User not found'}, HTTPStatus.NOT_FOUND
+        return {'error': 'id not found'}, HTTPStatus.NOT_FOUND
 
     session.delete(user)
     session.commit()
 
-    return '', HTTPStatus.NO_CONTENT
+    return ""
+    # return '', HTTPStatus.NO_CONTENT
     # except:
     #     return {'error': 'error'}, HTTPStatus.BAD_REQUEST
-    
-    # return '', HTTPStatus.NO_CONTENT
 
 
 @jwt_required()
@@ -145,6 +140,9 @@ def confirm_email(token):
 
     user = session.query(UserModel).filter_by(email=email).first()
     print(f'{user=}')
+
+    if user.is_validate:
+        return '<h1>Email já foi confirmado.</h1>'
 
     setattr(user, 'is_validate', True)
 

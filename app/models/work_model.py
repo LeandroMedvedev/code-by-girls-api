@@ -14,7 +14,7 @@ class WorkModel(db.Model):
     id: int
     title: str
     description: str
-    user_id: int
+    # user_id: int
 
     __tablename__ = 'works'
 
@@ -22,4 +22,5 @@ class WorkModel(db.Model):
     title = Column(String(50), nullable=False, unique=True)
     description = Column(Text, nullable=False)
 
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey(
+        'users.id'), nullable=False)
