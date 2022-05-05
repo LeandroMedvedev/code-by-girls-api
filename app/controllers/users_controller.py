@@ -145,7 +145,12 @@ def confirm_email(token):
     print(f'{user=}')
 
     if user.is_validate:
-        return '<h1>Email já foi confirmado.</h1'
+        return '''
+        <div style=" width: 100vw, height: 100vh, display: flex, justify-content: center">
+            <h1 style="color: blue">Email já foi confirmado.</h1
+        </div>
+        
+        '''
 
     setattr(user, 'is_validate', True)
 

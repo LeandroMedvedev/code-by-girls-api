@@ -14,6 +14,9 @@ def login():
 
     user: UserModel = UserModel.query.filter_by(email=data['email']).first()
 
+    if not user.is_validate:
+        return {"error": "verifucar seu email."}, HTTPStatus.BAD_REQUEST
+
     if not user:
         return {'error': 'User not found!'}, HTTPStatus.NOT_FOUND
 
