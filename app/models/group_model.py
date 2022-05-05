@@ -24,14 +24,14 @@ class GroupModel(db.Model):
     name = Column(VARCHAR(50), nullable=False, unique=True)
     description = Column(Text, nullable=False)
     user_id = Column(Integer, ForeignKey(
-        'users.id', ondelete='CASCADE'), nullable=False)
+        'users.id', ondelete='CASCADE'))
 
     users = relationship(
-        'UserModel', secondary=users_groups_table, backref='groups'
+        'UserModel', secondary=users_groups_table, cascade="all,delete", backref='groups'
     )
 
     user = relationship(
-        'UserModel',  backref=db.backref('group', uselist=False), uselist=False
+        'UserModel', cascade="all,delete", backref=db.backref('group', uselist=False), uselist=False
     )
 
     remark = relationship('CommentUserGroupModel',

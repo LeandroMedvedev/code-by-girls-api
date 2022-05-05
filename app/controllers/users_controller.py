@@ -26,6 +26,7 @@ s = URLSafeTimedSerializer('Thisisasecret!')
 
 
 def create_user():
+
     data = request.get_json()
 
     received_keys, valid_keys, invalid_keys = check_user_data(data)
@@ -43,7 +44,6 @@ def create_user():
 
     if check_value_type(data):
         return {'error': 'all values must be strings'}, HTTPStatus.BAD_REQUEST
-
     try:
         normalize_data(data)
         session: Session = current_app.db.session
@@ -53,16 +53,15 @@ def create_user():
         session.add(new_user)
         session.commit()
 
-        validates_email(new_user.email)
+        # validates_email(new_user.email)
 
         return jsonify({"msg": "verify you email!"}), HTTPStatus.CREATED
 
     except InvalidEmailError:
         return {'error': 'Error'}, HTTPStatus.BAD_REQUEST
 
-    except IntegrityError as e:
-        if type(e.orig) == UniqueViolation:
-
+    except IntegrityError as err:
+        if isinstance(err.orig, UniqueViolation):
             return {'error': 'Email is already exists'}, HTTPStatus.CONFLICT
 
 

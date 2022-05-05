@@ -28,10 +28,10 @@ class UserModel(db.Model):
     password_hash = Column(String)
 
     skills = relationship(
-        'SkillModel', backref='user')
+        'SkillModel', cascade="all,delete", backref='user')
 
     works = relationship(
-        'WorkModel', backref='user')
+        'WorkModel', cascade="all,delete", backref='user')
 
     @validates('email')
     def validate_email(self, key, email):
