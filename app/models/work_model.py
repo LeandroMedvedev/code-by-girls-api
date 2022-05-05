@@ -23,4 +23,4 @@ class WorkModel(db.Model):
     description = Column(Text, nullable=False)
 
     user_id = Column(Integer, ForeignKey(
-        'users.id', ondelete='CASCADE'), nullable=False)
+        'users.id'), nullable=False)

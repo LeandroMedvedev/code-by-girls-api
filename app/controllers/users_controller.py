@@ -55,7 +55,7 @@ def create_user():
 
         validates_email(new_user.email)
 
-        return jsonify(new_user), HTTPStatus.CREATED
+        return jsonify({"msg": "verify you email!"}), HTTPStatus.CREATED
 
     except InvalidEmailError:
         return {'error': 'Error'}, HTTPStatus.BAD_REQUEST

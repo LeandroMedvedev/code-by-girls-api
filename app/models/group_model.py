@@ -14,8 +14,8 @@ class GroupModel(db.Model):
     id: int
     name: str
     description: str
-    subscribe: list
-    group_owner: dict
+    users: list
+    user: dict
     remark: list
 
     __tablename__ = 'groups'
@@ -26,15 +26,16 @@ class GroupModel(db.Model):
     user_id = Column(Integer, ForeignKey(
         'users.id', ondelete='CASCADE'), nullable=False)
 
-    subscribe = relationship(
+    users = relationship(
         'UserModel', secondary=users_groups_table, backref='groups'
     )
 
-    group_owner = relationship(
-        'UserModel', backref=db.backref('group', uselist=False), uselist=False
+    user = relationship(
+        'UserModel',  backref=db.backref('group', uselist=False), uselist=False
     )
 
-    remark = relationship('CommentUserGroupModel', backref='groupComments')
+    remark = relationship('CommentUserGroupModel',
+                          backref='groupComments')
 
     @validates('name')
     def name_title(self, key: str, value: str):
