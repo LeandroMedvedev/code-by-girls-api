@@ -12,12 +12,12 @@ def login():
 
     data['email'] = data['email'].lower()
 
+    data['is_validate'] = False
     user: UserModel = UserModel.query.filter_by(email=data['email']).first()
 
-    if not user.is_validate:
-        return {"error": "verifucar seu email."}, HTTPStatus.BAD_REQUEST
-
-    if not user:
+    if not user and user.is_validate:
+        if not user.is_validate:
+            return {"error": "verifucar seu email."}, HTTPStatus.BAD_REQUEST
         return {'error': 'User not found!'}, HTTPStatus.NOT_FOUND
 
     if user.verify_password(data['password']):

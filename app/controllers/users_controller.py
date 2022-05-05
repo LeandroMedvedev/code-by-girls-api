@@ -105,26 +105,24 @@ def att_user(id):
 
 @jwt_required()
 def delete_user(id):
-    try:
-        session: Session = current_app.db.session
-        user_auth = get_jwt_identity()
+    # try:
+    session: Session = current_app.db.session
+    user_auth = get_jwt_identity()
 
-        user: Query = (
-            session.query(UserModel)
-            .filter_by(id=user_auth['id'])
-            .filter_by(id=id)
-            .first()
-        )
+    user: Query = (
+        session.query(UserModel).get(id)
+    )
 
-        if not user:
-            return {'error': 'id not found'}, HTTPStatus.NOT_FOUND
+    if not user:
+        return {'error': 'id not found'}, HTTPStatus.NOT_FOUND
 
-        session.delete(user)
-        session.commit()
+    session.delete(user)
+    session.commit()
 
-        return '', HTTPStatus.NO_CONTENT
-    except:
-        return {'error': 'error'}, HTTPStatus.BAD_REQUEST
+    return ""
+    # return '', HTTPStatus.NO_CONTENT
+    # except:
+    #     return {'error': 'error'}, HTTPStatus.BAD_REQUEST
 
 
 @jwt_required()
