@@ -165,4 +165,5 @@ def delete_group(id: int):
     #     if isinstance(e.orig, NotNullViolation):
     #         return {'error': 'Group not found'}, HTTPStatus.NOT_FOUND
 
-    return '', HTTPStatus.NO_CONTENT
+    # return '', HTTPStatus.NO_CONTENT
+    return jsonify(group)
