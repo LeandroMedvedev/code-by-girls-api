@@ -17,7 +17,7 @@ def create_work():
 
     try:
         for key, value in data.items():
-            if key == 'title'and type(value) == str:
+            if key == 'title' and type(value) == str:
                 data[key] = value.title()
 
             if not value:
@@ -29,8 +29,6 @@ def create_work():
                 return {
                     'error': {'valid_keys': correct_keys, 'key_sended': key}
                 }, HTTPStatus.BAD_REQUEST
-
-            
 
         validate_keys = list(correct_keys - data.keys())
         if len(validate_keys) != 0:
@@ -153,20 +151,15 @@ def patch_work(work_id):
         }, HTTPStatus.BAD_REQUEST
 
 
-
 @jwt_required()
 def get_work_to_id(work_id):
 
     work = WorkModel.query.get(work_id)
     session = current_app.db.session
-    
 
     if not work:
         return {'error': "Work doesn't exists!"}, HTTPStatus.NOT_FOUND
 
-  
     session.commit()
-
-
 
     return jsonify(work), HTTPStatus.OK
