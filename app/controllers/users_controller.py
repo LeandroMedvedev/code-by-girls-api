@@ -53,7 +53,7 @@ def create_user():
         session.add(new_user)
         session.commit()
 
-        # validates_email(new_user.email)
+        validates_email(new_user.email)
 
         return jsonify({"msg": "verify you email!"}), HTTPStatus.CREATED
 
@@ -63,6 +63,8 @@ def create_user():
     except IntegrityError as err:
         if isinstance(err.orig, UniqueViolation):
             return {'error': 'Email is already exists'}, HTTPStatus.CONFLICT
+    except:
+        return {'error': 'Email is already exists'}, HTTPStatus.CONFLICT
 
 
 @jwt_required()
@@ -139,7 +141,6 @@ def confirm_email(token):
     email = s.loads(token, salt='email-confirm', max_age=3600)
 
     user = session.query(UserModel).filter_by(email=email).first()
-    print(f'{user=}')
 
     if user.is_validate:
         return '<h1>Email já foi confirmado.</h1>'
