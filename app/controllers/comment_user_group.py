@@ -16,10 +16,11 @@ from app.models.user_group_table import users_groups_table
 @jwt_required()
 def get_all():
     session: Session = current_app.db.session
+    user_auth = get_jwt_identity()
 
     comments: CommentUserGroupModel = session.query(
         CommentUserGroupModel
-    ).all()
+    ).filter_by(user_id=user_auth["id"]).all()
 
     new_comments = [
         {
