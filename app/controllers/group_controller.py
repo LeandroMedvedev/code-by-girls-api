@@ -51,34 +51,14 @@ def create_group():
             'error': 'Invalid data type. Type must be a string'
         }, HTTPStatus.BAD_REQUEST
 
-    # data_groups = [
-    #     {
-    #         "name": one_group.name,
-    #         "description": one_group.description,
-
-    #     }
-    #     for one_group in group
-    # ]
-
     return jsonify(group), HTTPStatus.CREATED
 
 
-# @jwt_required()
-# def get_groups():
-#     groups: GroupModel = GroupModel.query.all()
+@jwt_required()
+def get_groups():
+    groups: GroupModel = GroupModel.query.all()
 
-#     data_groups = [
-#         {
-#             "id": group.id,
-#             "name": group.name,
-#             "description": group.description,
-#             # "subscribe": "teste",
-#             # "dono_do_grupo": "teste"
-#         }
-#         for group in groups
-#     ]
-
-#     return jsonify(data_groups), HTTPStatus.OK
+    return jsonify(groups), HTTPStatus.OK
 
 
 @jwt_required()
@@ -135,62 +115,62 @@ def delete_group(id: int):
         group: GroupModel = get_by_id(GroupModel, id)
 
         has_authorized: type = is_authorized(group.user_id)
+
+        session: Session = current_app.db.session
+        session.delete(group)
+        session.commit()
+
     except IdNotFoundError:
         return {'error': 'Group not found'}, HTTPStatus.NOT_FOUND
     except UserUnauthorizedError:
         return {
             'error': 'Unauthorized deletion. You are only allowed to delete groups created by you'
         }, HTTPStatus.UNAUTHORIZED
-
-    session: Session = current_app.db.session
-    session.delete(group)
-    session.commit()
+    # except IntegrityError as e:
+    #     if isinstance(e.orig, NotNullViolation):
+    #         return {'error': 'Group not found'}, HTTPStatus.NOT_FOUND
 
     return '', HTTPStatus.NO_CONTENT
 
 
-@jwt_required()
-def get_groups():
-    session: Session = current_app.db.session
-    user_auth = get_jwt_identity()
+# @jwt_required()
+# def get_groups():
+#     session: Session = current_app.db.session
+#     user_auth = get_jwt_identity()
 
-    query: Query = (
-        session.query(GroupModel)
-        .select_from(users_groups_table)
-        .join(GroupModel)
-        .join(UserModel)
-        .all()
-    )
+#     query: Query = (
+#         session.query(GroupModel).all()
+#     )
 
-    data_groups = [
-        {
-            'id': group.id,
-            'name': group.name,
-            'description': group.description,
-            'owner_group': {
-                'id': group.user.id,
-                'name': group.user.name,
-                'email': group.user.email,
-            },
-            'subscribe': [
-                {'id': subs.id, 'name': subs.name, 'email': subs.email}
-                for subs in group.users
-            ],
-            'comments': [
-                {
-                    'id': commenttator.id,
-                    'comments': commenttator.comments,
-                    'timestamp': commenttator.timestamp,
-                    'user': {
-                        'id': commenttator.user.id,
-                        'name': commenttator.user.name,
-                        'email': commenttator.user.email,
-                    },
-                }
-                for commenttator in group.remark
-            ],
-        }
-        for group in query
-    ]
+#     data_groups = [
+#         {
+#             'id': group.id,
+#             'name': group.name,
+#             'description': group.description,
+#             'owner_group': {
+#                 'id': group.user.id,
+#                 'name': group.user.name,
+#                 'email': group.user.email,
+#             },
+#             'subscribe': [
+#                 {'id': subs.id, 'name': subs.name, 'email': subs.email}
+#                 for subs in group.users
+#             ],
+#             'comments': [
+#                 {
+#                     'id': commenttator.id,
+#                     'comments': commenttator.comments,
+#                     'timestamp': commenttator.timestamp,
+#                     'user': {
+#                         'id': commenttator.user.id,
+#                         'name': commenttator.user.name,
+#                         'email': commenttator.user.email,
+#                     },
+#                 }
+#                 for commenttator in group.remark
+#             ],
+#         }
+#         for group in query
+#     ]
 
-    return jsonify(data_groups), HTTPStatus.OK
+#     return jsonify(data_groups), HTTPStatus.OK

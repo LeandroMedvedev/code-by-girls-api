@@ -45,10 +45,10 @@ def subscribes():
                 'error': {'valid_key': valid_key, 'key_sended': f'{key}'}
             }, HTTPStatus.BAD_REQUEST
 
-        if not value.isnumeric():
-            return {
-                'error': f"`{value}` isn't a valid value"
-            }, HTTPStatus.BAD_REQUEST
+        # if not value.isnumeric():
+        #     return {
+        #         'error': f"`{value}` isn't a valid value"
+        #     }, HTTPStatus.BAD_REQUEST
 
     groups: GroupModel = session.query(GroupModel).get(data['group_id'])
 

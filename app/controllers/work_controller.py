@@ -1,17 +1,12 @@
 from http import HTTPStatus
 
-from flask import current_app
-from flask import jsonify
-from flask import request
-from flask_jwt_extended import get_jwt_identity
-from flask_jwt_extended import jwt_required
-from psycopg2.errors import UniqueViolation
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Query
-from sqlalchemy.orm import Session
-
 from app.configs import db
 from app.models import WorkModel
+from flask import current_app, jsonify, request
+from flask_jwt_extended import get_jwt_identity, jwt_required
+from psycopg2.errors import UniqueViolation
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Query, Session
 
 
 @jwt_required()
@@ -22,7 +17,7 @@ def create_work():
 
     try:
         for key, value in data.items():
-            if key == 'title':
+            if key == 'title' and type(value) == str:
                 data[key] = value.title()
 
             if not value:
@@ -33,11 +28,6 @@ def create_work():
             if key not in correct_keys:
                 return {
                     'error': {'valid_keys': correct_keys, 'key_sended': key}
-                }, HTTPStatus.BAD_REQUEST
-
-            if type(value) != str:
-                return {
-                    'error': f'The value of {key.upper()} only accepted Strings'
                 }, HTTPStatus.BAD_REQUEST
 
         validate_keys = list(correct_keys - data.keys())
@@ -61,7 +51,7 @@ def create_work():
     except IntegrityError as e:
         if type(e.orig) == UniqueViolation:
             return {
-                'error': f"The title '{work_title}' is alredy exists"
+                'error': f"The Work Title: '{work_title}', is alredy exists"
             }, HTTPStatus.CONFLICT
 
 
@@ -159,3 +149,17 @@ def patch_work(work_id):
         return {
             'error': {'misssing_keys': validate_keys}
         }, HTTPStatus.BAD_REQUEST
+
+
+@jwt_required()
+def get_work_to_id(work_id):
+
+    work = WorkModel.query.get(work_id)
+    session = current_app.db.session
+
+    if not work:
+        return {'error': "Work doesn't exists!"}, HTTPStatus.NOT_FOUND
+
+    session.commit()
+
+    return jsonify(work), HTTPStatus.OK
