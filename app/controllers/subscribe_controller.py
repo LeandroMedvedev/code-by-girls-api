@@ -59,7 +59,7 @@ def subscribes():
 
     if user in groups.users:
         return {
-            'msg': 'you are already subscribed to this group'
+            'msg': 'You are already subscribed to this group'
         }, HTTPStatus.CONFLICT
 
     else:
@@ -81,16 +81,18 @@ def delete_subscribe(id: int):
     group: GroupModel = GroupModel.query.get(id)
 
     if not group:
-        return {"error": "Group nor found"}, HTTPStatus.NOT_FOUND
-    
+        return {'error': 'Group nor found'}, HTTPStatus.NOT_FOUND
+
     if user not in group.users:
-        return{"error":"errorr"}
+        return {'error': 'error'}
 
     try:
         group.users.remove(user)
-    
+
     except ValueError:
-        return {'msg': f"You were not subscribed to group `{group.name}`"}, HTTPStatus.BAD_REQUEST
+        return {
+            'msg': f'You were not subscribed to group `{group.name}`'
+        }, HTTPStatus.BAD_REQUEST
 
     session.add(group)
     session.commit()
@@ -98,4 +100,3 @@ def delete_subscribe(id: int):
     return {
         'msg': f'You unsubscribed from the group `{group.name}`'
     }, HTTPStatus.OK
-    
