@@ -2,6 +2,8 @@ from http import HTTPStatus
 from flask import current_app, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from sqlalchemy.orm import Session, Query
+from sqlalchemy.exc import IntegrityError
+from psycopg2.errors import ForeignKeyViolation
 from app.models.comment_user_group_table import CommentUserGroupModel
 from datetime import datetime
 from ipdb import set_trace
@@ -19,7 +21,21 @@ def get_all():
         CommentUserGroupModel
     ).all()
 
-    return jsonify(comments), HTTPStatus.OK
+    new_comments = [
+        {
+            "id": comm.id,
+            "comments": comm.comments,
+            "timestamp": comm.timestamp,
+            "user": {
+                "id": comm.user.id,
+                "name": comm.user.name,
+                "email": comm.user.email
+            }
+        }
+        for comm in comments
+    ]
+
+    return jsonify(new_comments), HTTPStatus.OK
 
 
 @jwt_required()
@@ -27,7 +43,19 @@ def get_by_id(id: int):
     comment = CommentUserGroupModel.query.get(id)
     if comment == None:
         return {'msg': 'Non-existent comment'}, HTTPStatus.NOT_FOUND
-    return jsonify(comment), HTTPStatus.OK
+
+    new_comments = {
+        "id": comment.id,
+        "comments": comment.comments,
+        "timestamp": comment.timestamp,
+        "user": {
+            "id": comment.user.id,
+            "name": comment.user.name,
+            "email": comment.user.email
+        }
+    }
+
+    return jsonify(new_comments), HTTPStatus.OK
 
 
 @jwt_required()
@@ -70,6 +98,10 @@ def created():
             'obtained': obtained,
         }, HTTPStatus.BAD_REQUEST
 
+    except IntegrityError as e:
+        if type(e.orig == ForeignKeyViolation):
+            return {'error': 'Group not found!'}, HTTPStatus.NOT_FOUND
+
 
 @jwt_required()
 def update(id: int):
@@ -93,7 +125,18 @@ def update(id: int):
 
             session.add(comment)
             session.commit()
-            return jsonify(comment), HTTPStatus.OK
+
+            new_comments = {
+                "id": comment.id,
+                "comments": comment.comments,
+                "timestamp": comment.timestamp,
+                "user": {
+                    "id": comment.user.id,
+                    "name": comment.user.name,
+                    "email": comment.user.email
+                }
+            }
+            return jsonify(new_comments), HTTPStatus.OK
         else:
             return {
                 'error': 'You can only update the comments field'
