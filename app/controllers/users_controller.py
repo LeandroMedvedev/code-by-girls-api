@@ -144,6 +144,9 @@ def confirm_email(token):
     user = session.query(UserModel).filter_by(email=email).first()
     print(f'{user=}')
 
+    if user.is_validate:
+        return '<h1>Email já foi confirmado.</h1'
+
     setattr(user, 'is_validate', True)
 
     session.commit()
