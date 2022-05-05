@@ -15,10 +15,9 @@ def get_subscribe():
     user_auth = get_jwt_identity()
 
     query: Query = (
-        session
-        .query(GroupModel)
+        session.query(GroupModel)
         .select_from(users_groups_table)
-        .filter_by(user_id=user_auth["id"])
+        .filter_by(user_id=user_auth['id'])
         .join(GroupModel)
         .join(UserModel)
         .all()
@@ -34,15 +33,11 @@ def subscribes():
 
     data = request.get_json()
 
-    groups: GroupModel = (
-        session
-        .query(GroupModel)
-        .get(data["group_id"])
-    )
+    groups: GroupModel = session.query(GroupModel).get(data['group_id'])
 
-    users = UserModel.query.get(user_auth["id"])
+    users = UserModel.query.get(user_auth['id'])
 
-    print(f"\n{users=}")
+    print(f'\n{users=}')
 
     groups.users.append(users)
 
@@ -58,7 +53,7 @@ def delete_subscribe(id: int):
     user_auth = get_jwt_identity()
 
     try:
-        user: UserModel = UserModel.query.get(user_auth["id"])
+        user: UserModel = UserModel.query.get(user_auth['id'])
 
         group: GroupModel = GroupModel.query.get(id)
 
@@ -68,6 +63,6 @@ def delete_subscribe(id: int):
         session.commit()
 
     except ValueError:
-        return {"error": "user not found!"}, HTTPStatus.NOT_FOUND
+        return {'error': 'user not found!'}, HTTPStatus.NOT_FOUND
 
     return jsonify(group)

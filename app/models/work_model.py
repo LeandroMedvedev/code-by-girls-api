@@ -11,7 +11,7 @@ class WorkModel(db.Model):
     title: str
     description: str
 
-    __tablename__ = "works"
+    __tablename__ = 'works'
 
     id = Column(Integer, primary_key=True)
     title = Column(String(50), nullable=False, unique=True)

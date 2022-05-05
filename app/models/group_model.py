@@ -19,30 +19,31 @@ class GroupModel(db.Model):
     user: dict
     remark: list
 
-    __tablename__ = "groups"
+    __tablename__ = 'groups'
 
     id = Column(Integer, primary_key=True)
     name = Column(VARCHAR(50), nullable=False, unique=True)
     description = Column(Text, nullable=False)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
 
     users = relationship(
-        "UserModel", secondary=users_groups_table, backref="groups")
+        'UserModel', secondary=users_groups_table, backref='groups'
+    )
 
-    user = relationship("UserModel", backref=db.backref(
-        "group", uselist=False), uselist=False)
+    user = relationship(
+        'UserModel', backref=db.backref('group', uselist=False), uselist=False
+    )
 
-    remark = relationship(
-        "CommentUserGroupModel", backref="groupComments")
+    remark = relationship('CommentUserGroupModel', backref='groupComments')
 
-    @validates("name")
+    @validates('name')
     def name_title(self, key: str, value: str):
         if type(value) != str:
             raise InvalidDataError
 
         return value.title()
 
-    @validates("description")
+    @validates('description')
     def description_capitalize(self, key: str, value: str):
         if type(value) != str:
             raise InvalidDataError

@@ -15,7 +15,7 @@ class CommentUserGroupModel(db.Model):
     timestamp: str
     user: dict
 
-    __tablename__ = "comments_users_groups"
+    __tablename__ = 'comments_users_groups'
 
     id = Column(Integer, primary_key=True)
     comments = Column(Text)
@@ -24,4 +24,4 @@ class CommentUserGroupModel(db.Model):
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     group_id = Column(Integer, ForeignKey('groups.id'), nullable=False)
 
-    user = db.relationship("UserModel", backref="comments")
+    user = db.relationship('UserModel', backref='comments')

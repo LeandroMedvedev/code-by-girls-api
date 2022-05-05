@@ -19,7 +19,7 @@ class UserModel(db.Model):
     skills: list
     works: list
 
-    __tablename__ = "users"
+    __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False)
@@ -27,19 +27,19 @@ class UserModel(db.Model):
     is_validate = Column(Boolean, default=False)
     password_hash = Column(String)
 
-    skills = relationship("SkillModel", backref="user")
-    works = relationship("WorkModel", backref="user")
+    skills = relationship('SkillModel', backref='user')
+    works = relationship('WorkModel', backref='user')
 
-    @validates("email")
+    @validates('email')
     def validate_email(self, key, email):
-        if "@" not in email or not email.endswith(".com"):
+        if '@' not in email or not email.endswith('.com'):
             raise InvalidEmailError
 
         return email.lower()
 
     @property
     def password(self):
-        raise AttributeError("Password cannot be accessed!")
+        raise AttributeError('Password cannot be accessed!')
 
     @password.setter
     def password(self, password_to_hash):
