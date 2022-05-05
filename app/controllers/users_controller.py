@@ -1,22 +1,29 @@
 from http import HTTPStatus
 from wsgiref import validate
-from flask_mail import Message
 
-from app.exceptions import InvalidEmailError, IdNotFoundError
-from app.models.user_model import UserModel
-from app.services import (
-    get_by_id,
-    check_user_data,
-    check_mandatory_keys,
-    normalize_data,
-    check_value_type,
-)
-from flask import current_app, jsonify, request, url_for
-from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask import current_app
+from flask import jsonify
+from flask import request
+from flask import url_for
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
+from flask_mail import Message
+from itsdangerous import URLSafeTimedSerializer
 from psycopg2.errors import UniqueViolation
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Query, Session
-from itsdangerous import URLSafeTimedSerializer, SignatureExpired
+from psycopg2.errors import IntegrityError
+from sqlalchemy.orm import Query
+from sqlalchemy.orm import Session
+
+from app.exceptions import IdNotFoundError
+from app.exceptions import InvalidEmailError
+from app.models import UserModel
+from app.services import (
+    check_mandatory_keys,
+    check_user_data,
+    check_value_type,
+    get_by_id,
+    normalize_data,
+)
 
 s = URLSafeTimedSerializer('Thisisasecret!')
 

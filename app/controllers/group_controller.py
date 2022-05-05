@@ -1,24 +1,17 @@
 from http import HTTPStatus
 
-from flask import current_app
-from flask import jsonify
-from flask import request
-from flask_jwt_extended import get_jwt_identity
-from flask_jwt_extended import jwt_required
+from app.exceptions import (
+    IdNotFoundError,
+    InvalidDataError,
+    UserUnauthorizedError,
+)
+from app.models import GroupModel, UserModel, users_groups_table
+from app.services import check_data, get_by_id, is_authorized
+from flask import current_app, jsonify, request
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from psycopg2.errors import NotNullViolation
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Query
-from sqlalchemy.orm import Session
-
-from app.exceptions import IdNotFoundError
-from app.exceptions import InvalidDataError
-from app.exceptions import UserUnauthorizedError
-from app.models import GroupModel
-from app.models import users_groups_table
-from app.models import UserModel
-from app.services import check_data
-from app.services import get_by_id
-from app.services import is_authorized
+from sqlalchemy.orm import Query, Session
 
 
 @jwt_required()
@@ -39,9 +32,9 @@ def create_group():
 
         group: GroupModel = GroupModel(**data)
 
-        # user: UserModel = UserModel.query.filter_by(id=user_auth["id"]).first()
+        user: UserModel = UserModel.query.filter_by(id=user_auth['id']).first()
 
-        # group.users.append(user)
+        group.users.append(user)
 
         session: Session = current_app.db.session
         session.add(group)

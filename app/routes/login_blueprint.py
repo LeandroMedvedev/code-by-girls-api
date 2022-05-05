@@ -1,5 +1,5 @@
 from flask import Blueprint
-from app.controllers.login_controllers import login
+from app.controllers import login_controllers
 
 bp_login = Blueprint('login', __name__, url_prefix='/login')
-bp_login.post('')(login)
+bp_login.post('')(login_controllers.login)

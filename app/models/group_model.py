@@ -1,12 +1,11 @@
 from dataclasses import dataclass
 
-from sqlalchemy.orm import relationship
-from sqlalchemy.orm import validates
-from sqlalchemy.sql.schema import Column, ForeignKey
-from sqlalchemy.sql.sqltypes import Integer, Text, VARCHAR
-
 from app.configs import db
 from app.exceptions import InvalidDataError
+from sqlalchemy.orm import relationship, validates
+from sqlalchemy.sql.schema import Column, ForeignKey
+from sqlalchemy.sql.sqltypes import VARCHAR, Integer, Text
+
 from .user_group_table import users_groups_table
 
 

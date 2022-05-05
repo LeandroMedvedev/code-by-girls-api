@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 from enum import unique
 
-from sqlalchemy.orm import validates, relationship
+from app.configs import db
+from app.exceptions import InvalidEmailError
+from sqlalchemy.orm import relationship, validates
 from sqlalchemy.sql.schema import Column
 from sqlalchemy.sql.sqltypes import Integer, String, Boolean
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from app.configs import db
-from app.exceptions import InvalidEmailError
 from .user_group_table import users_groups_table
 
 

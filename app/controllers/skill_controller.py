@@ -1,8 +1,10 @@
 from http import HTTPStatus
+
+from flask import current_app, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
-from flask import request, current_app, jsonify
-from ..models import SkillModel
+
 from ..exceptions import LevelInvalidError
+from ..models import SkillModel
 
 
 @jwt_required()

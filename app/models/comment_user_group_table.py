@@ -1,11 +1,10 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-from sqlalchemy.sql.schema import Column, ForeignKey
-from sqlalchemy.sql.sqltypes import Integer, Text, DateTime
-
 from app.configs import db
 from app.models.group_model import GroupModel
+from sqlalchemy.sql.schema import Column, ForeignKey
+from sqlalchemy.sql.sqltypes import DateTime, Integer, Text
 
 
 @dataclass

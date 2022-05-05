@@ -1,7 +1,6 @@
 from flask import Blueprint
 from app.controllers import comment_user_group
 
-
 bp = Blueprint('comments', __name__, url_prefix='/comments')
 
 

@@ -1,8 +1,12 @@
 from dataclasses import dataclass
 
+from sqlalchemy.sql.schema import Column
+from sqlalchemy.sql.schema import ForeignKey
+from sqlalchemy.sql.sqltypes import Integer
+from sqlalchemy.sql.sqltypes import String
+from sqlalchemy.sql.sqltypes import Text
+
 from app.configs import db
-from sqlalchemy.sql.schema import Column, ForeignKey
-from sqlalchemy.sql.sqltypes import Integer, String, Text
 
 
 @dataclass
@@ -10,6 +14,7 @@ class WorkModel(db.Model):
     id: int
     title: str
     description: str
+    user_id: int
 
     __tablename__ = 'works'
 
