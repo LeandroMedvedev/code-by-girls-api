@@ -14,8 +14,8 @@ class GroupModel(db.Model):
     id: int
     name: str
     description: str
-    users: list
-    user: dict
+    subscribe: list
+    group_owner: dict
     remark: list
 
     __tablename__ = 'groups'
@@ -23,13 +23,14 @@ class GroupModel(db.Model):
     id = Column(Integer, primary_key=True)
     name = Column(VARCHAR(50), nullable=False, unique=True)
     description = Column(Text, nullable=False)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey(
+        'users.id', ondelete='CASCADE'), nullable=False)
 
-    users = relationship(
+    subscribe = relationship(
         'UserModel', secondary=users_groups_table, backref='groups'
     )
 
-    user = relationship(
+    group_owner = relationship(
         'UserModel', backref=db.backref('group', uselist=False), uselist=False
     )
 
