@@ -29,13 +29,33 @@ def get_subscribe():
 
     new_subs = [
         {
-            "id": subs.id,
-            "name": subs.name,
-            "description": subs.description,
-            "subscribes": [{"id": subs.id, "name": subs.name, "email": subs.email} for subs in subs.users],
-            "group_owner": {"id": subs.user.id, "name": subs.user.name, "email": subs.user.email},
-            "commits": [{"id": rem.id, "comments": rem.comments, "timestamp": rem.timestamp, "user": {"id": rem.user.id, "name": rem.user.name, "email": rem.user.email, }} for rem in subs.remark]
-        } for subs in query
+            'id': subs.id,
+            'name': subs.name,
+            'description': subs.description,
+            'subscribes': [
+                {'id': subs.id, 'name': subs.name, 'email': subs.email}
+                for subs in subs.users
+            ],
+            'group_owner': {
+                'id': subs.user.id,
+                'name': subs.user.name,
+                'email': subs.user.email,
+            },
+            'commits': [
+                {
+                    'id': rem.id,
+                    'comments': rem.comments,
+                    'timestamp': rem.timestamp,
+                    'user': {
+                        'id': rem.user.id,
+                        'name': rem.user.name,
+                        'email': rem.user.email,
+                    },
+                }
+                for rem in subs.remark
+            ],
+        }
+        for subs in query
     ]
 
     return jsonify(new_subs)
@@ -80,12 +100,31 @@ def subscribes():
     session.commit()
 
     new_groups = {
-        "id": groups.id,
-        "name": groups.name,
-        "description": groups.description,
-        "subscribes": [{"id": subs.id, "name": subs.name, "email": subs.email} for subs in groups.users],
-        "group_owner": {"id": groups.user.id, "name": groups.user.name, "email": groups.user.email},
-        "commits": [{"id": rem.id, "comments": rem.comments, "timestamp": rem.timestamp, "user": {"id": rem.user.id, "name": rem.user.name, "email": rem.user.email, }} for rem in groups.remark]
+        'id': groups.id,
+        'name': groups.name,
+        'description': groups.description,
+        'subscribes': [
+            {'id': subs.id, 'name': subs.name, 'email': subs.email}
+            for subs in groups.users
+        ],
+        'group_owner': {
+            'id': groups.user.id,
+            'name': groups.user.name,
+            'email': groups.user.email,
+        },
+        'commits': [
+            {
+                'id': rem.id,
+                'comments': rem.comments,
+                'timestamp': rem.timestamp,
+                'user': {
+                    'id': rem.user.id,
+                    'name': rem.user.name,
+                    'email': rem.user.email,
+                },
+            }
+            for rem in groups.remark
+        ],
     }
 
     return jsonify(new_groups), HTTPStatus.CREATED

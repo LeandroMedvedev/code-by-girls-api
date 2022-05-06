@@ -5,13 +5,13 @@ from app.exceptions import (
     InvalidDataError,
     UserUnauthorizedError,
 )
-from app.models import GroupModel, UserModel, users_groups_table
+from app.models import GroupModel, UserModel
 from app.services import check_data, get_by_id, is_authorized
 from flask import current_app, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
-from psycopg2.errors import NotNullViolation, UniqueViolation
+from psycopg2.errors import NotNullViolation
 from sqlalchemy.exc import IntegrityError, PendingRollbackError
-from sqlalchemy.orm import Query, Session
+from sqlalchemy.orm import Session
 
 
 @jwt_required()
@@ -65,13 +65,33 @@ def get_groups():
 
     new_groups = [
         {
-            "id": grupo.id,
-            "name": grupo.name,
-            "description": grupo.description,
-            "subscribes": [{"id": subs.id, "name": subs.name, "email": subs.email} for subs in grupo.users],
-            "group_owner": {"id": grupo.user.id, "name": grupo.user.name, "email": grupo.user.email},
-            "commits": [{"id": rem.id, "comments": rem.comments, "timestamp": rem.timestamp, "user": {"id": rem.user.id, "name": rem.user.name, "email": rem.user.email, }} for rem in grupo.remark]
-        } for grupo in groups
+            'id': grupo.id,
+            'name': grupo.name,
+            'description': grupo.description,
+            'subscribes': [
+                {'id': subs.id, 'name': subs.name, 'email': subs.email}
+                for subs in grupo.users
+            ],
+            'group_owner': {
+                'id': grupo.user.id,
+                'name': grupo.user.name,
+                'email': grupo.user.email,
+            },
+            'commits': [
+                {
+                    'id': rem.id,
+                    'comments': rem.comments,
+                    'timestamp': rem.timestamp,
+                    'user': {
+                        'id': rem.user.id,
+                        'name': rem.user.name,
+                        'email': rem.user.email,
+                    },
+                }
+                for rem in grupo.remark
+            ],
+        }
+        for grupo in groups
     ]
 
     return jsonify(new_groups), HTTPStatus.OK
@@ -83,12 +103,31 @@ def get_group_by_id(id: int):
         group = get_by_id(GroupModel, id)
 
         new_groups = {
-            "id": group.id,
-            "name": group.name,
-            "description": group.description,
-            "subscribes": [{"id": subs.id, "name": subs.name, "email": subs.email} for subs in group.users],
-            "group_owner": {"id": group.user.id, "name": group.user.name, "email": group.user.email},
-            "commits": [{"id": rem.id, "comments": rem.comments, "timestamp": rem.timestamp, "user": {"id": rem.user.id, "name": rem.user.name, "email": rem.user.email, }} for rem in group.remark]
+            'id': group.id,
+            'name': group.name,
+            'description': group.description,
+            'subscribes': [
+                {'id': subs.id, 'name': subs.name, 'email': subs.email}
+                for subs in group.users
+            ],
+            'group_owner': {
+                'id': group.user.id,
+                'name': group.user.name,
+                'email': group.user.email,
+            },
+            'commits': [
+                {
+                    'id': rem.id,
+                    'comments': rem.comments,
+                    'timestamp': rem.timestamp,
+                    'user': {
+                        'id': rem.user.id,
+                        'name': rem.user.name,
+                        'email': rem.user.email,
+                    },
+                }
+                for rem in group.remark
+            ],
         }
 
     except IdNotFoundError:
@@ -115,12 +154,31 @@ def update_group(id: int):
             setattr(group, key, value)
 
         new_groups = {
-            "id": group.id,
-            "name": group.name,
-            "description": group.description,
-            "subscribes": [{"id": subs.id, "name": subs.name, "email": subs.email} for subs in group.users],
-            "group_owner": {"id": group.user.id, "name": group.user.name, "email": group.user.email},
-            "commits": [{"id": rem.id, "comments": rem.comments, "timestamp": rem.timestamp, "user": {"id": rem.user.id, "name": rem.user.name, "email": rem.user.email, }} for rem in group.remark]
+            'id': group.id,
+            'name': group.name,
+            'description': group.description,
+            'subscribes': [
+                {'id': subs.id, 'name': subs.name, 'email': subs.email}
+                for subs in group.users
+            ],
+            'group_owner': {
+                'id': group.user.id,
+                'name': group.user.name,
+                'email': group.user.email,
+            },
+            'commits': [
+                {
+                    'id': rem.id,
+                    'comments': rem.comments,
+                    'timestamp': rem.timestamp,
+                    'user': {
+                        'id': rem.user.id,
+                        'name': rem.user.name,
+                        'email': rem.user.email,
+                    },
+                }
+                for rem in group.remark
+            ],
         }
 
         session: Session = current_app.db.session
@@ -161,9 +219,5 @@ def delete_group(id: int):
         return {
             'error': 'Unauthorized deletion. You are only allowed to delete groups created by you'
         }, HTTPStatus.UNAUTHORIZED
-    # except IntegrityError as e:
-    #     if isinstance(e.orig, NotNullViolation):
-    #         return {'error': 'Group not found'}, HTTPStatus.NOT_FOUND
 
-    # return '', HTTPStatus.NO_CONTENT
-    return jsonify(group)
+    return '', HTTPStatus.NO_CONTENT

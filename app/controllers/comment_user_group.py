@@ -18,20 +18,22 @@ def get_all():
     session: Session = current_app.db.session
     user_auth = get_jwt_identity()
 
-    comments: CommentUserGroupModel = session.query(
-        CommentUserGroupModel
-    ).filter_by(user_id=user_auth["id"]).all()
+    comments: CommentUserGroupModel = (
+        session.query(CommentUserGroupModel)
+        .filter_by(user_id=user_auth['id'])
+        .all()
+    )
 
     new_comments = [
         {
-            "id": comm.id,
-            "comments": comm.comments,
-            "timestamp": comm.timestamp,
-            "user": {
-                "id": comm.user.id,
-                "name": comm.user.name,
-                "email": comm.user.email
-            }
+            'id': comm.id,
+            'comments': comm.comments,
+            'timestamp': comm.timestamp,
+            'user': {
+                'id': comm.user.id,
+                'name': comm.user.name,
+                'email': comm.user.email,
+            },
         }
         for comm in comments
     ]
@@ -46,14 +48,14 @@ def get_by_id(id: int):
         return {'msg': 'Non-existent comment'}, HTTPStatus.NOT_FOUND
 
     new_comments = {
-        "id": comment.id,
-        "comments": comment.comments,
-        "timestamp": comment.timestamp,
-        "user": {
-            "id": comment.user.id,
-            "name": comment.user.name,
-            "email": comment.user.email
-        }
+        'id': comment.id,
+        'comments': comment.comments,
+        'timestamp': comment.timestamp,
+        'user': {
+            'id': comment.user.id,
+            'name': comment.user.name,
+            'email': comment.user.email,
+        },
     }
 
     return jsonify(new_comments), HTTPStatus.OK
@@ -128,14 +130,14 @@ def update(id: int):
             session.commit()
 
             new_comments = {
-                "id": comment.id,
-                "comments": comment.comments,
-                "timestamp": comment.timestamp,
-                "user": {
-                    "id": comment.user.id,
-                    "name": comment.user.name,
-                    "email": comment.user.email
-                }
+                'id': comment.id,
+                'comments': comment.comments,
+                'timestamp': comment.timestamp,
+                'user': {
+                    'id': comment.user.id,
+                    'name': comment.user.name,
+                    'email': comment.user.email,
+                },
             }
             return jsonify(new_comments), HTTPStatus.OK
         else:

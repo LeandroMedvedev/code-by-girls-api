@@ -56,7 +56,7 @@ def create_user():
 
         validates_email(new_user.email)
 
-        return jsonify({"msg": "verify you email!"}), HTTPStatus.CREATED
+        return jsonify({'msg': 'verify you email!'}), HTTPStatus.CREATED
 
     except InvalidEmailError:
         return {'error': 'Error'}, HTTPStatus.BAD_REQUEST
@@ -111,12 +111,10 @@ def delete_user(id):
     session: Session = current_app.db.session
     user_auth = get_jwt_identity()
 
-    user: Query = (
-        session.query(UserModel).get(id)
-    )
+    user: Query = session.query(UserModel).get(id)
 
     if not user:
-        return {'error': 'id not found'}, HTTPStatus.NOT_FOUND
+        return {'error': 'User not found'}, HTTPStatus.NOT_FOUND
 
     group_owner: Query = (
         session.query(users_groups_table)
