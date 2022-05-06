@@ -1,8 +1,12 @@
-from sqlalchemy import Column, String, Integer
-from ..exceptions import LevelInvalidError
-from sqlalchemy.orm import validates
 from dataclasses import dataclass
+
+from sqlalchemy import Column
+from sqlalchemy import Integer
+from sqlalchemy import String
+from sqlalchemy.orm import validates
+
 from app.configs import db
+from app.exceptions import LevelInvalidError
 
 
 @dataclass

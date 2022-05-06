@@ -1,11 +1,13 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-from app.configs import db
-from app.models.group_model import GroupModel
-from sqlalchemy.sql.schema import Column, ForeignKey
-from sqlalchemy.sql.sqltypes import DateTime, Integer, Text
+from sqlalchemy.sql.schema import Column
+from sqlalchemy.sql.schema import ForeignKey
+from sqlalchemy.sql.sqltypes import DateTime
+from sqlalchemy.sql.sqltypes import Integer
+from sqlalchemy.sql.sqltypes import Text
 
+from app.configs import db
 
 @dataclass
 class CommentUserGroupModel(db.Model):

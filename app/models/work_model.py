@@ -14,7 +14,6 @@ class WorkModel(db.Model):
     id: int
     title: str
     description: str
-    # user_id: int
 
     __tablename__ = 'works'
 

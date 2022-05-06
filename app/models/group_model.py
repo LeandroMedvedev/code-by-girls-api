@@ -1,11 +1,15 @@
 from dataclasses import dataclass
 
+from sqlalchemy.orm import relationship
+from sqlalchemy.orm import validates
+from sqlalchemy.sql.schema import Column
+from sqlalchemy.sql.schema import ForeignKey
+from sqlalchemy.sql.sqltypes import Integer
+from sqlalchemy.sql.sqltypes import Text
+from sqlalchemy.sql.sqltypes import VARCHAR
+
 from app.configs import db
 from app.exceptions import InvalidDataError
-from sqlalchemy.orm import relationship, validates
-from sqlalchemy.sql.schema import Column, ForeignKey
-from sqlalchemy.sql.sqltypes import VARCHAR, Integer, Text
-
 from .user_group_table import users_groups_table
 
 
@@ -21,7 +25,7 @@ class GroupModel(db.Model):
     __tablename__ = 'groups'
 
     id = Column(Integer, primary_key=True)
-    name = Column(VARCHAR(50), nullable=False, unique=True)
+    name = Column(VARCHAR(50), nullable=False)
     description = Column(Text, nullable=False)
     user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'))
 

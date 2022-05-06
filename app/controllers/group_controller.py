@@ -1,23 +1,29 @@
 from http import HTTPStatus
 
-from app.exceptions import (
-    IdNotFoundError,
-    InvalidDataError,
-    UserUnauthorizedError,
-)
-from app.models import GroupModel, UserModel
-from app.services import check_data, get_by_id, is_authorized
-from flask import current_app, jsonify, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask import current_app
+from flask import jsonify
+from flask import request
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
 from psycopg2.errors import NotNullViolation
-from sqlalchemy.exc import IntegrityError, PendingRollbackError
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.orm import Session
+
+from app.exceptions import IdNotFoundError
+from app.exceptions import InvalidDataError
+from app.exceptions import UserUnauthorizedError
+from app.models import GroupModel
+from app.models import UserModel
+from app.services import check_data
+from app.services import get_by_id
+from app.services import is_authorized
 
 
 @jwt_required()
 def create_group():
+
     data: dict = request.get_json()
-    print(f'{data=}')
 
     received_keys, valid_keys, invalid_keys = check_data(data)
 
@@ -28,12 +34,19 @@ def create_group():
         }, HTTPStatus.BAD_REQUEST
 
     try:
+        group_exists: GroupModel = GroupModel.query.filter_by(
+            name=data.get('name').title()
+        ).first()
+
+        if group_exists:
+            return {
+                'error': 'Group already exists, choose another name.'
+            }, HTTPStatus.CONFLICT
+
         user_auth: dict = get_jwt_identity()
         data['user_id'] = user_auth['id']
-        print(f'{data=}')
 
         group: GroupModel = GroupModel(**data)
-        print(f'{group=}')
 
         user: UserModel = UserModel.query.filter_by(id=user_auth['id']).first()
 
@@ -43,21 +56,17 @@ def create_group():
         session.add(group)
         session.commit()
 
-    except TypeError:
-        return {'error': 'Group name already exists!'}, HTTPStatus.CONFLICT
     except IntegrityError as err:
         if isinstance(err.orig, NotNullViolation):
             return {
                 'required_keys': list(valid_keys),
                 'received_keys': list(received_keys),
             }, HTTPStatus.UNPROCESSABLE_ENTITY
-    except InvalidDataError:
+
+    except (InvalidDataError, ProgrammingError):
         return {
             'error': 'Invalid data type. Type must be a string'
         }, HTTPStatus.BAD_REQUEST
-
-    except PendingRollbackError:
-        return {'error': 'Group name already exists!'}, HTTPStatus.CONFLICT
 
     return jsonify(group), HTTPStatus.CREATED
 
@@ -80,7 +89,7 @@ def get_groups():
                 'name': grupo.user.name,
                 'email': grupo.user.email,
             },
-            'commits': [
+            'remarks': [
                 {
                     'id': rem.id,
                     'comments': rem.comments,
@@ -118,7 +127,7 @@ def get_group_by_id(id: int):
                 'name': group.user.name,
                 'email': group.user.email,
             },
-            'commits': [
+            'remarks': [
                 {
                     'id': rem.id,
                     'comments': rem.comments,
@@ -150,13 +159,25 @@ def update_group(id: int):
 
         received_keys, valid_keys, invalid_keys = check_data(data)
 
-        data['name'] = data['name'].title()
-        data['description'] = data['description'].capitalize()
+        for key, value in data.items():
+            if key == 'name' and type(value) == str:
+                data[key] = value.title()
+            if key == 'description' and type(value) is str:
+                data[key] = value.capitalize()
+
+        group_exists: GroupModel = GroupModel.query.filter_by(
+            name=data.get('name')
+        ).first()
+
+        if group_exists:
+            return {
+                'error': 'Group already exists, choose another name.'
+            }, HTTPStatus.CONFLICT
 
         for key, value in data.items():
             setattr(group, key, value)
 
-        new_groups = {
+        new_group = {
             'id': group.id,
             'name': group.name,
             'description': group.description,
@@ -169,7 +190,7 @@ def update_group(id: int):
                 'name': group.user.name,
                 'email': group.user.email,
             },
-            'commits': [
+            'remarks': [
                 {
                     'id': rem.id,
                     'comments': rem.comments,
@@ -186,23 +207,26 @@ def update_group(id: int):
 
         session: Session = current_app.db.session
         session.commit()
+
     except IdNotFoundError:
         return {'error': 'Group not found'}, HTTPStatus.NOT_FOUND
-    except KeyError:
-        return {
-            'invalid_keys': list(invalid_keys),
-            'valid_keys': list(valid_keys),
-        }, HTTPStatus.BAD_REQUEST
+
     except AttributeError:
         return {
             'error': 'Values must be of type string'
         }, HTTPStatus.BAD_REQUEST
+
     except UserUnauthorizedError:
         return {
             'error': 'Unauthorized update. You are only allowed to update groups created by you'
         }, HTTPStatus.UNAUTHORIZED
 
-    return jsonify(new_groups), HTTPStatus.OK
+    except (InvalidDataError, ProgrammingError):
+        return {
+            'error': 'Invalid data type. Type must be a string'
+        }, HTTPStatus.BAD_REQUEST
+
+    return jsonify(new_group), HTTPStatus.OK
 
 
 @jwt_required()

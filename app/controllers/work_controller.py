@@ -1,12 +1,14 @@
 from http import HTTPStatus
 
-from app.configs import db
-from app.models import WorkModel
 from flask import current_app, jsonify, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
 from psycopg2.errors import UniqueViolation
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Query, Session
+from sqlalchemy.orm import Session
+
+from app.configs import db
+from app.models import WorkModel
 
 
 @jwt_required()
@@ -53,7 +55,7 @@ def create_work():
     except IntegrityError as e:
         if type(e.orig) == UniqueViolation:
             return {
-                'error': f"The Work Title: '{work_title}', is alredy exists"
+                'error': f"The Work Title: '{work_title}' is alredy exists"
             }, HTTPStatus.CONFLICT
 
 

@@ -15,7 +15,6 @@ from sqlalchemy.orm import Session
 
 from app.exceptions import IdNotFoundError
 from app.exceptions import InvalidEmailError
-from app.models import GroupModel
 from app.models import UserModel
 from app.models import users_groups_table
 from app.services import check_mandatory_keys
@@ -92,6 +91,12 @@ def att_user(id):
 
         if not user:
             return {'error': 'User not found'}, HTTPStatus.NOT_FOUND
+        
+        for key, value in data.items():
+            if key == 'name' and type(value) == str:
+                data[key] = value.title()
+            if key == 'description' and type(value) is str:
+                data[key] = value.capitalize()
 
         for key, values in data.items():
             setattr(user, key, values)
@@ -110,8 +115,8 @@ def att_user(id):
 def delete_user(id):
 
     session: Session = current_app.db.session
+
     user_auth = get_jwt_identity()
-    print(f'{user_auth["id"]=}')
 
     user: Query = session.query(UserModel).get(id)
 
@@ -123,6 +128,7 @@ def delete_user(id):
         .filter_by(user_id=user_auth['id'])
         .first()
     )
+
     if not group_owner:
         session.delete(user)
         session.commit()

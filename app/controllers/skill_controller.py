@@ -1,10 +1,13 @@
 from http import HTTPStatus
 
-from flask import current_app, jsonify, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask import current_app
+from flask import jsonify
+from flask import request
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
 
-from ..exceptions import LevelInvalidError
-from ..models import SkillModel
+from app.exceptions import LevelInvalidError
+from app.models import SkillModel
 
 
 @jwt_required()
@@ -28,7 +31,7 @@ def create_skill():
 
     except LevelInvalidError:
         return {
-            'msg': 'Invalid level, value must be: Iniciante,Intermediario ou Avançado'
+            'msg': 'Invalid level, value must be: Iniciante, Intermediario ou Avançado'
         }, HTTPStatus.BAD_REQUEST
 
 
@@ -62,10 +65,10 @@ def atualize_skill(id):
         if skill == None:
             return {'msg': 'Non-existent skill'}, HTTPStatus.NOT_FOUND
         if user['id'] != skill.user_id:
-            print(user['id'])
-            print(skill.user_id)
-            print(skill)
-            print(user)
+            # print(user['id'])
+            # print(skill.user_id)
+            # print(skill)
+            # print(user)
             return {
                 'msg': 'It is possible to update only your skills'
             }, HTTPStatus.BAD_REQUEST
@@ -79,7 +82,7 @@ def atualize_skill(id):
         return jsonify(skill), HTTPStatus.OK
     except LevelInvalidError:
         return {
-            'msg': 'Invalid level, value must be: Iniciante,Intermediario ou Avançado'
+            'msg': 'Invalid level, value must be: Iniciante, Intermediario ou Avançado'
         }, HTTPStatus.BAD_REQUEST
 
 
