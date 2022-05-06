@@ -631,24 +631,3 @@ Leandro Medvedev - Tech Lead
 ##### **3rd May 2022, Brazil**  
 
 ![GitHub followers](https://img.shields.io/github/followers/leandromedvedev?style=social)  
-
-<!-- Corrigir -->
-<!-- Erro em PATCH api/users -> usuário existe e dá not found (usuário 3, Hugo Reyes) -->
-
-<!-- create_work -> se eu passar um valor numérico, não string: AttributeError
-AttributeError: 'int' object has no attribute 'title' -->
-
-<!-- verificar tratamento de dados enviados para o banco, padronizar, sempre que possível, com validates, não no controller -->
-
-<!-- corrigir nome de algumas funções, padronizar em inglês -->
-
-<!-- padronizar work_id como id somente -->
-
-<!-- foto do GitHub do Samuel -->
-
-<!-- branch featGroups: ao criar usuário com e-mail já cadastrado, IntegrityError
-sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "users_email_key"
-DETAIL:  Key (email)=(leandromedvedev@hotmail.com) already exists. -->
-
-
-<!-- Não consigor deleter usuário, c -->
