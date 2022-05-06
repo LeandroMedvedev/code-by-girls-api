@@ -27,8 +27,9 @@ class UserModel(db.Model):
     is_validate = Column(Boolean, default=False)
     password_hash = Column(String)
 
-    skills = relationship('SkillModel', backref='user')
-    works = relationship('WorkModel', backref='user')
+    skills = relationship('SkillModel', cascade='all,delete', backref='user')
+
+    works = relationship('WorkModel', cascade='all,delete', backref='user')
 
     @validates('email')
     def validate_email(self, key, email):

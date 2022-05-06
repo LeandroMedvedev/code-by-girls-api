@@ -10,37 +10,49 @@ Há um total de 28 endpoints.
 
 #### **Method | Endpoint**
 
-* POST     /api/users  
-* GET      /api/users  
-* GET      /api/users/&lt;int:id&gt;  
-* PATCH    /api/users/&lt;int:id&gt;  
-* DELETE   /api/users/&lt;int:id&gt; 
-* POST     /api/comments  
-* DELETE   /api/comments/&lt;int:id&gt;  
-* GET      /api/comments  
-* GET      /api/comments/&lt;int:id&gt;  
-* PATCH    /api/comments/&lt;int:id&gt;  
-* POST     /api/groups  
-* DELETE   /api/groups/&lt;int:id&gt;  
-* GET      /api/groups/&lt;int:id&gt;  
-* GET      /api/groups  
-* PATCH    /api/groups/&lt;int:id&gt;  
-* POST     /api/login  
-* PATCH    /api/users/skills/&lt;int:id&gt;  
-* POST     /api/users/skills  
-* DELETE   /api/users/skills/&lt;int:id&gt;  
-* GET      /api/users/skills  
-* GET      /api/users/skills/&lt;int:id&gt;  
-* DELETE   /api/groups/subscribes/&lt;int:id&gt;  
-* GET      /api/groups/subscribes  
-* POST     /api/groups/subscribes   
-* POST     /api/users/works  
-* DELETE   /api/users/works/&lt;int:work_id&gt;  
-* GET      /api/users/works  
-* PATCH    /api/users/works/&lt;int:work_id&gt;  
+1. POST     /api/login  
+***  
+
+1. POST     /api/users  
+2. GET      /api/users  
+3. GET      /api/users/&lt;int:id&gt;  
+4. PATCH    /api/users/&lt;int:id&gt;  
+5. DELETE   /api/users/&lt;int:id&gt;  
+***  
+
+1. POST     /api/users/works  
+2. GET      /api/users/works  
+3. PATCH    /api/users/works/&lt;int:work_id&gt;  
+4. DELETE   /api/users/works/&lt;int:work_id&gt;  
+***  
+
+1. POST     /api/users/skills  
+2. GET      /api/users/skills  
+3. GET      /api/users/skills/&lt;int:id&gt;  
+4. PATCH    /api/users/skills/&lt;int:id&gt;  
+5. DELETE   /api/users/skills/&lt;int:id&gt;  
+***  
+
+1. POST     /api/groups  
+2. GET      /api/groups  
+3. GET      /api/groups/&lt;int:id&gt;  
+4. PATCH    /api/groups/&lt;int:id&gt;  
+5. DELETE   /api/groups/&lt;int:id&gt;  
+***  
+
+1. POST     /api/groups/subscribes   
+2. GET      /api/groups/subscribes  
+3. DELETE   /api/groups/subscribes/&lt;int:id&gt;  
+***  
+
+1. POST     /api/comments  
+2. GET      /api/comments  
+3. GET      /api/comments/&lt;int:id&gt;  
+4. PATCH    /api/comments/&lt;int:id&gt;  
+5. DELETE   /api/comments/&lt;int:id&gt;  
 
 ***  
-## **Users**  
+# **Users**  
 
 * POST     /api/users  
 * GET      /api/users  
@@ -143,7 +155,7 @@ Campos obrigatórios:
 ```  
 
 ***
-## **Login**  
+# **Login**  
 
 ## **Método <font color=lime>POST</font> - /api/login**  
 
@@ -437,20 +449,162 @@ No body
 ```  
 
 ***  
-## **Groups**  
+# **Works**  
 
+1. POST     /api/users/works  
+2. GET      /api/users/works  
+3. PATCH    /api/users/works/&lt;int:work_id&gt;  
+4. DELETE   /api/users/works/&lt;int:work_id&gt; 
 
-***  
-## **Comments**  
+Rotas responsáveis pela criação, busca, atualização e deleção de works. Campos na requisição:
 
+* title  
+* description  
 
-***  
-## **Users Skills**  
+### ***Requisição <font color='0096FF'>CORRETA</font>***
 
+## **<font color=lime>POST</font> /api/users/works - Formato da Requisição**  
+```py 
+{  
+	"title": "Code by Girls - capstone",  
+	"description": "Q3 final work"  
+}  
+```  
 
-***  
-## **Works**  
+## **<font color=lime>POST</font> /api/users/works - Formato da Resposta - <font color=lime>201 CREATED</font>**  
+```py  
+{  
+	"id": 1,  
+	"title": "Code By Girls - Capstone",  
+	"description": "Q3 final work",  
+	"user_id": 4  
+}  
+```  
 
+### ***Requisições <font color='F70D1A'>ERRADAS</font>***  
+
+1. ***Caso 1 -*** *chave excedente passada ou correta, mas escrita de modo errado:*  
+
+## **<font color=lime>POST</font> /api/users/works - Formato da Requisição**  
+```py 
+{  
+	"title": "Code by Girls - capstone",  
+	"description": "Q3 final work",  
+	"chave_excedente": "surplus key"  
+}  
+```    
+
+## **<font color=lime>POST</font> /api/users/works - Formato da Resposta - <font color=FFA500>400 BAD REQUEST</font>**  
+```py  
+{  
+	"error": {  
+		"valid_keys": [  
+			"title",  
+			"description"  
+		],  
+		"key_sended": "chave_excedente"  
+	}  
+}  
+```  
+
+2. ***Caso 2 -*** *chave passada não é do tipo string:*  
+
+## **<font color=lime>POST</font> /api/users/works - Formato da Requisição**  
+```py 
+{  
+	"title": 9,  
+	"description": "Q3 final work"   
+}  
+``` 
+
+<!-- Corrigir o tratamento de erro de create_work quando passo um valor que não é do tipo string -->
+
+3. ***Caso 3 -*** *usuário não autenticado:*  
+
+## **<font color=lime>POST</font> /api/users/works; - Formato da Resposta - <font color='FFA500'>422 UNPROCESSABLE ENTITY</font>**  
+```py  
+{  
+	"msg": "Bad Authorization header. Expected 'Authorization: Bearer <JWT>'"  
+}  
+```  
+
+## **Método <font color=C710AF>GET</font> - /api/users/works**  
+
+Rota de busca de works do usuário exige autenticação, do contrário, status 422.  
+
+## **<font color=C710AF>GET</font> /api/users/works - Formato da Requisição**  
+```py  
+No body  
+```  
+
+## **<font color=C710AF>GET</font> /api/users/works - Formato da Resposta - <font color=lime>200 OK</font>**  
+```py  
+[  
+	{  
+		"id": 1,  
+		"title": "Code By Girls - Capstone",  
+		"description": "Q3 final work"  
+	}  
+]  
+```  
+
+## **Método <font color='FFFF2E'>PATCH</font> - /api/users/works**  
+
+Rota de atualização do work do usuário exige autenticação, do contrário, status 422.  
+
+### ***Requisição <font color='0096FF'>CORRETA</font>***
+
+## **<font color=FFFF2E>PATCH</font> /api/users/works/&lt;int:id&gt; - Formato da Requisição**  
+```py  
+{  
+	"title": "Habit Management",  
+	"description": "Q2 final work"  
+}  
+```  
+
+## **<font color=FFFF2E>PATCH</font> /api/users/works/&lt;int:id&gt; - Formato da Resposta - <font color=lime>200 OK</font>**  
+```py  
+{  
+	"id": 1,  
+	"title": "Habit Management",  
+	"description": "Q2 final work",  
+	"user_id": 4  
+}  
+```  
+
+### ***Requisições <font color='F70D1A'>ERRADAS</font>***  
+
+1. ***Caso 1 -*** *chave errada:*  
+
+## **<font color=FFFF2E>PATCH</font> /api/users/works/&lt;int:id&gt; - Formato da Requisição**  
+```py  
+{  
+	"chave_errada": "Q2 final Work"  
+}  
+```  
+
+## **<font color=FFFF2E>PATCH</font> /api/users/works/&lt;int:id&gt; - Formato da Resposta - <font color=FFA500>400 BAD REQUEST</font>**  
+```py  
+{  
+	"error": {  
+		"valid_keys": [  
+			"title",  
+			"description"  
+		],  
+		"key_sended": "chave_errada"  
+	}  
+}  
+```  
+
+2. ***Caso 2 -*** *id passado na URL não existe no banco:*  
+
+## **<font color=FFFF2E>PATCH</font> /api/users/works/&lt;int:id&gt; - Formato da Resposta - <font color=FFA500>404 NOT FOUND</font>**  
+```py  
+{  
+	"error": "Work doesn't exists!"  
+}  
+```  
+<!-- começar da parte de deleção do work do user -->
 
 ***  
 ## **Groups Subscribes**   
@@ -477,3 +631,24 @@ Leandro Medvedev - Tech Lead
 ##### **3rd May 2022, Brazil**  
 
 ![GitHub followers](https://img.shields.io/github/followers/leandromedvedev?style=social)  
+
+<!-- Corrigir -->
+<!-- Erro em PATCH api/users -> usuário existe e dá not found (usuário 3, Hugo Reyes) -->
+
+<!-- create_work -> se eu passar um valor numérico, não string: AttributeError
+AttributeError: 'int' object has no attribute 'title' -->
+
+<!-- verificar tratamento de dados enviados para o banco, padronizar, sempre que possível, com validates, não no controller -->
+
+<!-- corrigir nome de algumas funções, padronizar em inglês -->
+
+<!-- padronizar work_id como id somente -->
+
+<!-- foto do GitHub do Samuel -->
+
+<!-- branch featGroups: ao criar usuário com e-mail já cadastrado, IntegrityError
+sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "users_email_key"
+DETAIL:  Key (email)=(leandromedvedev@hotmail.com) already exists. -->
+
+
+<!-- Não consigor deleter usuário, c -->

@@ -27,7 +27,38 @@ def get_subscribe():
         .all()
     )
 
-    return jsonify(query)
+    new_subs = [
+        {
+            'id': subs.id,
+            'name': subs.name,
+            'description': subs.description,
+            'subscribes': [
+                {'id': subs.id, 'name': subs.name, 'email': subs.email}
+                for subs in subs.users
+            ],
+            'group_owner': {
+                'id': subs.user.id,
+                'name': subs.user.name,
+                'email': subs.user.email,
+            },
+            'commits': [
+                {
+                    'id': rem.id,
+                    'comments': rem.comments,
+                    'timestamp': rem.timestamp,
+                    'user': {
+                        'id': rem.user.id,
+                        'name': rem.user.name,
+                        'email': rem.user.email,
+                    },
+                }
+                for rem in subs.remark
+            ],
+        }
+        for subs in query
+    ]
+
+    return jsonify(new_subs)
 
 
 @jwt_required()
@@ -45,10 +76,10 @@ def subscribes():
                 'error': {'valid_key': valid_key, 'key_sended': f'{key}'}
             }, HTTPStatus.BAD_REQUEST
 
-        if not value.isnumeric():
-            return {
-                'error': f"`{value}` isn't a valid value"
-            }, HTTPStatus.BAD_REQUEST
+        # if not value.isnumeric():
+        #     return {
+        #         'error': f"`{value}` isn't a valid value"
+        #     }, HTTPStatus.BAD_REQUEST
 
     groups: GroupModel = session.query(GroupModel).get(data['group_id'])
 
@@ -68,7 +99,35 @@ def subscribes():
     session.add(groups)
     session.commit()
 
-    return jsonify(groups), HTTPStatus.CREATED
+    new_groups = {
+        'id': groups.id,
+        'name': groups.name,
+        'description': groups.description,
+        'subscribes': [
+            {'id': subs.id, 'name': subs.name, 'email': subs.email}
+            for subs in groups.users
+        ],
+        'group_owner': {
+            'id': groups.user.id,
+            'name': groups.user.name,
+            'email': groups.user.email,
+        },
+        'commits': [
+            {
+                'id': rem.id,
+                'comments': rem.comments,
+                'timestamp': rem.timestamp,
+                'user': {
+                    'id': rem.user.id,
+                    'name': rem.user.name,
+                    'email': rem.user.email,
+                },
+            }
+            for rem in groups.remark
+        ],
+    }
+
+    return jsonify(new_groups), HTTPStatus.CREATED
 
 
 @jwt_required()
@@ -84,7 +143,7 @@ def delete_subscribe(id: int):
         return {'error': 'Group nor found'}, HTTPStatus.NOT_FOUND
 
     if user not in group.users:
-        return {'error': 'error'}
+        return {'error': 'Subscribe not found!'}, HTTPStatus.NOT_FOUND
 
     try:
         group.users.remove(user)

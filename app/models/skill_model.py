@@ -16,7 +16,9 @@ class SkillModel(db.Model):
     id = Column(Integer, primary_key=True)
     skill = Column(String(100), nullable=False)
     level = Column(String(50), nullable=False)
-    user_id = Column(Integer, db.ForeignKey('users.id'), nullable=False)
+    user_id = Column(
+        Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False
+    )
 
     @validates('level')
     def validade_importance(self, key, level):
