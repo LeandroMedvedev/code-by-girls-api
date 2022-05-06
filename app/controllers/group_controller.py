@@ -1,15 +1,12 @@
 from http import HTTPStatus
 
-from app.exceptions import (
-    IdNotFoundError,
-    InvalidDataError,
-    UserUnauthorizedError,
-)
+from app.exceptions import (IdNotFoundError, InvalidDataError,
+                            UserUnauthorizedError)
 from app.models import GroupModel, UserModel
 from app.services import check_data, get_by_id, is_authorized
 from flask import current_app, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
-from psycopg2.errors import NotNullViolation
+from psycopg2.errors import NotNullViolation, UniqueViolation
 from sqlalchemy.exc import IntegrityError, PendingRollbackError
 from sqlalchemy.orm import Session
 
@@ -201,6 +198,12 @@ def update_group(id: int):
         return {
             'error': 'Unauthorized update. You are only allowed to update groups created by you'
         }, HTTPStatus.UNAUTHORIZED
+    
+    except IntegrityError as e:
+        if type(e.orig) == UniqueViolation:
+            return {
+                'error': "Group is alredy exists"
+            }, HTTPStatus.CONFLICT
 
     return jsonify(new_groups), HTTPStatus.OK
 
