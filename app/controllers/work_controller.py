@@ -19,6 +19,8 @@ def create_work():
         for key, value in data.items():
             if key == 'title' and type(value) == str:
                 data[key] = value.title()
+            if key == 'description' and type(value) is str:
+                data[key] = value.capitalize()
 
             if not value:
                 return {
@@ -110,8 +112,10 @@ def patch_work(work_id):
             }, HTTPStatus.BAD_REQUEST
 
         for key, value in data.items():
-            if key == 'title':
+            if key == 'title' and type(value) == str:
                 data[key] = value.title()
+            if key == 'description' and type(value) is str:
+                data[key] = value.capitalize()
 
             if not value:
                 return {

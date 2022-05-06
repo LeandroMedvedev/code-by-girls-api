@@ -15,7 +15,9 @@ from sqlalchemy.orm import Session
 
 from app.exceptions import IdNotFoundError
 from app.exceptions import InvalidEmailError
+from app.models import GroupModel
 from app.models import UserModel
+from app.models import users_groups_table
 from app.services import check_mandatory_keys
 from app.services import check_user_data
 from app.services import check_value_type
@@ -53,9 +55,9 @@ def create_user():
         session.add(new_user)
         session.commit()
 
-        # validates_email(new_user.email)
+        validates_email(new_user.email)
 
-        return jsonify({"msg": "verify you email!"}), HTTPStatus.CREATED
+        return jsonify({'msg': 'verify you email!'}), HTTPStatus.CREATED
 
     except InvalidEmailError:
         return {'error': 'Error'}, HTTPStatus.BAD_REQUEST
@@ -63,6 +65,8 @@ def create_user():
     except IntegrityError as err:
         if isinstance(err.orig, UniqueViolation):
             return {'error': 'Email is already exists'}, HTTPStatus.CONFLICT
+    except:
+        return {'error': 'Email is already exists'}, HTTPStatus.CONFLICT
 
 
 @jwt_required()
@@ -87,7 +91,7 @@ def att_user(id):
         )
 
         if not user:
-            return {'error': 'id not found'}, HTTPStatus.NOT_FOUND
+            return {'error': 'User not found'}, HTTPStatus.NOT_FOUND
 
         for key, values in data.items():
             setattr(user, key, values)
@@ -98,30 +102,36 @@ def att_user(id):
 
     except:
         return {
-            'invalid_email': 'Past email should have a format similar to:  something@something.com'
+            'invalid_email': 'Past email should have a format similar to: something@something.com'
         }, HTTPStatus.BAD_REQUEST
 
 
 @jwt_required()
 def delete_user(id):
-    # try:
+
     session: Session = current_app.db.session
     user_auth = get_jwt_identity()
+    print(f'{user_auth["id"]=}')
 
-    user: Query = (
-        session.query(UserModel).get(id)
-    )
+    user: Query = session.query(UserModel).get(id)
 
     if not user:
-        return {'error': 'id not found'}, HTTPStatus.NOT_FOUND
+        return {'error': 'User not found'}, HTTPStatus.NOT_FOUND
 
-    session.delete(user)
-    session.commit()
+    group_owner: Query = (
+        session.query(users_groups_table)
+        .filter_by(user_id=user_auth['id'])
+        .first()
+    )
+    if not group_owner:
+        session.delete(user)
+        session.commit()
+    else:
+        return {
+            'error': 'Before deleting your account, delete the groups associated with it'
+        }, HTTPStatus.UNPROCESSABLE_ENTITY
 
-    return ""
-    # return '', HTTPStatus.NO_CONTENT
-    # except:
-    #     return {'error': 'error'}, HTTPStatus.BAD_REQUEST
+    return '', HTTPStatus.NO_CONTENT
 
 
 @jwt_required()
@@ -139,7 +149,6 @@ def confirm_email(token):
     email = s.loads(token, salt='email-confirm', max_age=3600)
 
     user = session.query(UserModel).filter_by(email=email).first()
-    print(f'{user=}')
 
     if user.is_validate:
         return '<h1>Email já foi confirmado.</h1>'
