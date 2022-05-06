@@ -6,7 +6,6 @@ from sqlalchemy.exc import IntegrityError
 from psycopg2.errors import ForeignKeyViolation
 from app.models.comment_user_group_table import CommentUserGroupModel
 from datetime import datetime
-from ipdb import set_trace
 
 from app.models.group_model import GroupModel
 from app.models.user_model import UserModel
