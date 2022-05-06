@@ -55,7 +55,7 @@ def create_user():
         session.add(new_user)
         session.commit()
 
-        # validates_email(new_user.email)
+        validates_email(new_user.email)
 
         return jsonify({'msg': 'verify you email!'}), HTTPStatus.CREATED
 
@@ -65,6 +65,8 @@ def create_user():
     except IntegrityError as err:
         if isinstance(err.orig, UniqueViolation):
             return {'error': 'Email is already exists'}, HTTPStatus.CONFLICT
+    except:
+        return {'error': 'Email is already exists'}, HTTPStatus.CONFLICT
 
 
 @jwt_required()
@@ -106,44 +108,31 @@ def att_user(id):
 
 @jwt_required()
 def delete_user(id):
-    # try:
+
     session: Session = current_app.db.session
     user_auth = get_jwt_identity()
     print(f'{user_auth["id"]=}')
 
     user: Query = session.query(UserModel).get(id)
-    print(f'{user=}')
 
     if not user:
         return {'error': 'User not found'}, HTTPStatus.NOT_FOUND
 
-    group_owner: Query = session.query(GroupModel).get(id)
-    # group_owner: Query = (
-    #     session.query(users_groups_table)
-    #     .filter_by(user_id=user_auth['id'])
-    #     .first()
-    # )
+    group_owner: Query = (
+        session.query(users_groups_table)
+        .filter_by(user_id=user_auth['id'])
+        .first()
+    )
+    if not group_owner:
+        session.delete(user)
+        session.commit()
+    else:
+        return {
+            'error': 'Before deleting your account, delete the groups associated with it'
+        }, HTTPStatus.UNPROCESSABLE_ENTITY
 
-
-    print(f'{group_owner=}')
-    # if not group_owner:
-    #     session.delete(user)
-    #     session.commit()
-    #     print('EEEEEEEEEUUUUUUUU')
-    # else:
-    #     return {
-    #         'error': 'Before deleting your account, delete the groups associated with it'
-    #     }, HTTPStatus.UNPROCESSABLE_ENTITY
-
-    # return ''
     return '', HTTPStatus.NO_CONTENT
-    # except:
-    #     return {'error': 'error'}, HTTPStatus.BAD_REQUEST
-    # group=[GroupModel(id=5, name='Mens 1', description='Mens group formmed',
-    # users=[UserModel(id=10, name='Leandro Medvedev', email='leandromedvedev@hotmail.com', skills=[], works=[])],
-    # user=UserModel(id=10, name='Leandro Medvedev', email='leandromedvedev@hotmail.com', skills=[], works=[]),
-    # remark=[])]
-    # print(f'{group=}')
+
 
 @jwt_required()
 def get_user_by_id(id):
@@ -160,7 +149,6 @@ def confirm_email(token):
     email = s.loads(token, salt='email-confirm', max_age=3600)
 
     user = session.query(UserModel).filter_by(email=email).first()
-    print(f'{user=}')
 
     if user.is_validate:
         return '<h1>Email já foi confirmado.</h1>'

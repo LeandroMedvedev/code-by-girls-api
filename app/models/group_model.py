@@ -26,17 +26,11 @@ class GroupModel(db.Model):
     user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'))
 
     users = relationship(
-        'UserModel',
-        secondary=users_groups_table,
-        cascade='all,delete',
-        backref='groups',
+        'UserModel', secondary=users_groups_table, backref='groups'
     )
 
     user = relationship(
-        'UserModel',
-        cascade='all,delete',
-        backref=db.backref('group', uselist=False),
-        uselist=False,
+        'UserModel', backref=db.backref('group', uselist=False), uselist=False
     )
 
     remark = relationship('CommentUserGroupModel', backref='groupComments')
