@@ -13,7 +13,7 @@ from app.models import WorkModel
 
 @jwt_required()
 def create_work():
-    data = request.get_json()
+    data: dict = request.get_json()
 
     correct_keys = ['title', 'description']
 

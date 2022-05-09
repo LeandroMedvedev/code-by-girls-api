@@ -5,6 +5,8 @@ from flask import jsonify
 from flask import request
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
+from sqlalchemy.exc import DataError
+from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 
@@ -15,9 +17,9 @@ from app.models import UserModel
 
 @jwt_required()
 def get_subscribe():
-    session: Session = current_app.db.session
     user_auth = get_jwt_identity()
 
+    session: Session = current_app.db.session
     query: Query = (
         session.query(GroupModel)
         .select_from(users_groups_table)
@@ -27,21 +29,21 @@ def get_subscribe():
         .all()
     )
 
-    new_subs = [
+    enrolled = [
         {
             'id': subs.id,
             'name': subs.name,
             'description': subs.description,
-            'subscribes': [
-                {'id': subs.id, 'name': subs.name, 'email': subs.email}
-                for subs in subs.users
-            ],
             'group_owner': {
                 'id': subs.user.id,
                 'name': subs.user.name,
                 'email': subs.user.email,
             },
-            'commits': [
+            'subscribes': [
+                {'id': subs.id, 'name': subs.name, 'email': subs.email}
+                for subs in subs.users
+            ],
+            'remarks': [
                 {
                     'id': rem.id,
                     'comments': rem.comments,
@@ -58,15 +60,14 @@ def get_subscribe():
         for subs in query
     ]
 
-    return jsonify(new_subs)
+    return jsonify(enrolled)
 
 
 @jwt_required()
 def subscribes():
-    session: Session = current_app.db.session
     user_auth = get_jwt_identity()
 
-    data = request.get_json()
+    data: dict = request.get_json()
 
     for key, value in data.items():
         valid_key = 'group_id'
@@ -76,12 +77,13 @@ def subscribes():
                 'error': {'valid_key': valid_key, 'key_sended': f'{key}'}
             }, HTTPStatus.BAD_REQUEST
 
-        # if not value.isnumeric():
-        #     return {
-        #         'error': f"`{value}` isn't a valid value"
-        #     }, HTTPStatus.BAD_REQUEST
-
-    groups: GroupModel = session.query(GroupModel).get(data['group_id'])
+    try:
+        session: Session = current_app.db.session
+        groups: GroupModel = session.query(GroupModel).get(data['group_id'])
+    except (DataError, InvalidRequestError):
+        return {
+            'error': 'Invalid data type. The type must be an integer'
+        }, HTTPStatus.BAD_REQUEST
 
     if not groups:
         return {'error': "Group doesn't exists"}, HTTPStatus.NOT_FOUND
@@ -99,20 +101,20 @@ def subscribes():
     session.add(groups)
     session.commit()
 
-    new_groups = {
+    subscription = {
         'id': groups.id,
         'name': groups.name,
         'description': groups.description,
-        'subscribes': [
-            {'id': subs.id, 'name': subs.name, 'email': subs.email}
-            for subs in groups.users
-        ],
         'group_owner': {
             'id': groups.user.id,
             'name': groups.user.name,
             'email': groups.user.email,
         },
-        'commits': [
+        'subscribes': [
+            {'id': subs.id, 'name': subs.name, 'email': subs.email}
+            for subs in groups.users
+        ],
+        'remarks': [
             {
                 'id': rem.id,
                 'comments': rem.comments,
@@ -127,12 +129,11 @@ def subscribes():
         ],
     }
 
-    return jsonify(new_groups), HTTPStatus.CREATED
+    return subscription, HTTPStatus.CREATED
 
 
 @jwt_required()
 def delete_subscribe(id: int):
-    session: Session = current_app.db.session
     user_auth = get_jwt_identity()
 
     user: UserModel = UserModel.query.filter_by(id=user_auth['id']).first()
@@ -140,7 +141,7 @@ def delete_subscribe(id: int):
     group: GroupModel = GroupModel.query.get(id)
 
     if not group:
-        return {'error': 'Group nor found'}, HTTPStatus.NOT_FOUND
+        return {'error': 'Group not found'}, HTTPStatus.NOT_FOUND
 
     if user not in group.users:
         return {'error': 'Subscribe not found!'}, HTTPStatus.NOT_FOUND
@@ -150,9 +151,10 @@ def delete_subscribe(id: int):
 
     except ValueError:
         return {
-            'msg': f'You were not subscribed to group `{group.name}`'
+            'msg': f'You were not subscribed to group "{group.name}"'
         }, HTTPStatus.BAD_REQUEST
 
+    session: Session = current_app.db.session
     session.add(group)
     session.commit()
 

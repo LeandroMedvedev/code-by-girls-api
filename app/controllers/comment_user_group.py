@@ -1,34 +1,38 @@
+from datetime import datetime as dt
 from http import HTTPStatus
-from flask import current_app, jsonify, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
-from sqlalchemy.orm import Session, Query
-from sqlalchemy.exc import IntegrityError
-from psycopg2.errors import ForeignKeyViolation
-from app.models.comment_user_group_table import CommentUserGroupModel
-from datetime import datetime
 
-from app.models.group_model import GroupModel
-from app.models.user_model import UserModel
-from app.models.user_group_table import users_groups_table
+from flask import current_app
+from flask import jsonify
+from flask import request
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
+from sqlalchemy.orm import Query
+from sqlalchemy.orm import Session
+
+from app.exceptions import InvalidDataError
+from app.models import CommentUserGroupModel
+from app.models import GroupModel
+from app.models import users_groups_table
+from app.models import UserModel
 
 
 @jwt_required()
 def get_all():
-    session: Session = current_app.db.session
     user_auth = get_jwt_identity()
 
+    session: Session = current_app.db.session
     comments: CommentUserGroupModel = (
         session.query(CommentUserGroupModel)
         .filter_by(user_id=user_auth['id'])
         .all()
     )
 
-    new_comments = [
+    remarks = [
         {
             'id': comm.id,
             'comments': comm.comments,
             'timestamp': comm.timestamp,
-            'user': {
+            'author': {
                 'id': comm.user.id,
                 'name': comm.user.name,
                 'email': comm.user.email,
@@ -37,39 +41,44 @@ def get_all():
         for comm in comments
     ]
 
-    return jsonify(new_comments), HTTPStatus.OK
+    return jsonify(remarks), HTTPStatus.OK
 
 
 @jwt_required()
 def get_by_id(id: int):
     comment = CommentUserGroupModel.query.get(id)
+
     if comment == None:
         return {'msg': 'Non-existent comment'}, HTTPStatus.NOT_FOUND
 
-    new_comments = {
+    remark = {
         'id': comment.id,
         'comments': comment.comments,
         'timestamp': comment.timestamp,
-        'user': {
+        'author': {
             'id': comment.user.id,
             'name': comment.user.name,
             'email': comment.user.email,
         },
     }
 
-    return jsonify(new_comments), HTTPStatus.OK
+    return remark, HTTPStatus.OK
 
 
 @jwt_required()
-def created():
+def create(id: int):
     user_auth = get_jwt_identity()
-    session: Session = current_app.db.session
+
     data: dict = request.get_json()
-    dt = datetime.now()
-    data['timestamp'] = dt
+    received_keys = [key for key in data.keys()]
+    data['timestamp'] = dt.now()
     data['user_id'] = user_auth['id']
 
     try:
+        session: Session = current_app.db.session
+        """
+            query looks for the groups in which the user is subscribed
+        """
         query: Query = (
             session.query(GroupModel)
             .select_from(users_groups_table)
@@ -79,39 +88,56 @@ def created():
             .all()
         )
 
-        if query:
+        is_registered = list()
 
-            comment = CommentUserGroupModel(**data)
+        for q in query:
+            is_registered.append(q.id)
 
+        is_enrolled = is_registered.index(id)
+
+        """
+            is_enrolled is equal to zero because, if the validation was done only with 'if is_enrolled' and the index was 0, 0 is equal to False
+        """
+        if is_enrolled or is_enrolled == 0:
+            group_to_comment: GroupModel = GroupModel.query.get(id)
+            comment: CommentUserGroupModel = CommentUserGroupModel(**data)
+
+            group_to_comment.remark.append(comment)
             session.add(comment)
             session.commit()
 
-            return jsonify(comment), HTTPStatus.CREATED
+            remark = {
+                'id': comment.id,
+                'comment': comment.comments,
+                'timestamp': comment.timestamp,
+                'author': {'id': comment.user_id, 'name': comment.user.name},
+            }
 
+            return remark, HTTPStatus.CREATED
+
+    except ValueError:
         return {
-            'error': 'To post a comment, you must be subscribed to a group'
-        }, HTTPStatus.UNAUTHORIZED
+            'error': 'Either you are not subscribed or the group does not exist'
+        }, HTTPStatus.NOT_FOUND
 
     except TypeError:
-        expected = ['comments', 'timestamp', 'user_id', 'group_id']
-        obtained = [key for key in data.keys()]
         return {
-            'expected': expected,
-            'obtained': obtained,
+            'valid_key': 'comments',
+            'received_keys': received_keys,
         }, HTTPStatus.BAD_REQUEST
 
-    except IntegrityError as e:
-        if type(e.orig == ForeignKeyViolation):
-            return {'error': 'Group not found!'}, HTTPStatus.NOT_FOUND
+    except InvalidDataError:
+        return {
+            'error': 'Invalid data type. The comment must be of type string'
+        }, HTTPStatus.BAD_REQUEST
 
 
 @jwt_required()
 def update(id: int):
-
-    session: Session = current_app.db.session
+    user: dict = get_jwt_identity()
     data: dict = request.get_json()
-    user = get_jwt_identity()
-    comment = CommentUserGroupModel.query.get(id)
+
+    comment: CommentUserGroupModel = CommentUserGroupModel.query.get(id)
 
     if comment == None:
         return {'msg': 'Non-existent comment'}, HTTPStatus.NOT_FOUND
@@ -121,42 +147,53 @@ def update(id: int):
             'msg': 'It is possible to update only your comments'
         }, HTTPStatus.BAD_REQUEST
 
-    for key, value in data.items():
-        if key == 'comments':
-            setattr(comment, key, value)
+    try:
+        for key, value in data.items():
+            if key == 'comments':
+                setattr(comment, key, value)
 
-            session.add(comment)
-            session.commit()
+                session: Session = current_app.db.session
+                session.add(comment)
+                session.commit()
 
-            new_comments = {
-                'id': comment.id,
-                'comments': comment.comments,
-                'timestamp': comment.timestamp,
-                'user': {
-                    'id': comment.user.id,
-                    'name': comment.user.name,
-                    'email': comment.user.email,
-                },
-            }
-            return jsonify(new_comments), HTTPStatus.OK
-        else:
-            return {
-                'error': 'You can only update the comments field'
-            }, HTTPStatus.BAD_REQUEST
+                updated_comment = {
+                    'id': comment.id,
+                    'comments': comment.comments,
+                    'timestamp': comment.timestamp,
+                    'user': {
+                        'id': comment.user.id,
+                        'name': comment.user.name,
+                    },
+                }
+                return updated_comment, HTTPStatus.OK
+            else:
+                return {
+                    'valid_key': 'comment',
+                    'invalid_keys': list(data.keys()),
+                }, HTTPStatus.BAD_REQUEST
+
+    except InvalidDataError:
+        return {
+            'error': 'Invalid data type. The comment must be of type string'
+        }, HTTPStatus.BAD_REQUEST
 
 
 @jwt_required()
 def delete(id: int):
-    comment = CommentUserGroupModel.query.get(id)
-    session = current_app.db.session
-    user = get_jwt_identity()
+    user: dict = get_jwt_identity()
+
+    comment: CommentUserGroupModel = CommentUserGroupModel.query.get(id)
+
     if comment == None:
         return {'msg': 'Non-existent comment'}, HTTPStatus.NOT_FOUND
+
     if user['id'] != comment.user_id:
         return {
             'msg': 'It is possible to delete only your comments'
-        }, HTTPStatus.BAD_REQUEST
+        }, HTTPStatus.UNAUTHORIZED
 
+    session: Session = current_app.db.session
     session.delete(comment)
     session.commit()
+
     return '', HTTPStatus.NO_CONTENT

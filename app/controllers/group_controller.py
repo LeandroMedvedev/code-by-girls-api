@@ -56,6 +56,14 @@ def create_group():
         session.add(group)
         session.commit()
 
+        new_group = {
+            'name': group.name,
+            'description': group.description,
+            'id': group.id,
+        }
+
+        return jsonify(new_group), HTTPStatus.CREATED
+
     except IntegrityError as err:
         if isinstance(err.orig, NotNullViolation):
             return {
@@ -63,50 +71,46 @@ def create_group():
                 'received_keys': list(received_keys),
             }, HTTPStatus.UNPROCESSABLE_ENTITY
 
-    except (InvalidDataError, ProgrammingError):
+    except (AttributeError, InvalidDataError, ProgrammingError):
         return {
             'error': 'Invalid data type. Type must be a string'
         }, HTTPStatus.BAD_REQUEST
-
-    return jsonify(group), HTTPStatus.CREATED
 
 
 @jwt_required()
 def get_groups():
     groups: GroupModel = GroupModel.query.all()
 
-    new_groups = [
+    all_groups = [
         {
-            'id': grupo.id,
-            'name': grupo.name,
-            'description': grupo.description,
-            'subscribes': [
-                {'id': subs.id, 'name': subs.name, 'email': subs.email}
-                for subs in grupo.users
-            ],
+            'id': group.id,
+            'name': group.name,
+            'description': group.description,
             'group_owner': {
-                'id': grupo.user.id,
-                'name': grupo.user.name,
-                'email': grupo.user.email,
+                'id': group.user.id,
+                'name': group.user.name,
             },
+            'subscribes': [
+                {'name': subs.name, 'email': subs.email}
+                for subs in group.users
+            ],
             'remarks': [
                 {
                     'id': rem.id,
                     'comments': rem.comments,
                     'timestamp': rem.timestamp,
-                    'user': {
+                    'author': {
                         'id': rem.user.id,
                         'name': rem.user.name,
-                        'email': rem.user.email,
                     },
                 }
-                for rem in grupo.remark
+                for rem in group.remark
             ],
         }
-        for grupo in groups
+        for group in groups
     ]
 
-    return jsonify(new_groups), HTTPStatus.OK
+    return jsonify(all_groups), HTTPStatus.OK
 
 
 @jwt_required()
@@ -114,28 +118,26 @@ def get_group_by_id(id: int):
     try:
         group = get_by_id(GroupModel, id)
 
-        new_groups = {
+        researched_group = {
             'id': group.id,
             'name': group.name,
             'description': group.description,
             'subscribes': [
-                {'id': subs.id, 'name': subs.name, 'email': subs.email}
+                {'name': subs.name, 'email': subs.email}
                 for subs in group.users
             ],
             'group_owner': {
                 'id': group.user.id,
                 'name': group.user.name,
-                'email': group.user.email,
             },
             'remarks': [
                 {
                     'id': rem.id,
                     'comments': rem.comments,
                     'timestamp': rem.timestamp,
-                    'user': {
+                    'author': {
                         'id': rem.user.id,
                         'name': rem.user.name,
-                        'email': rem.user.email,
                     },
                 }
                 for rem in group.remark
@@ -145,7 +147,7 @@ def get_group_by_id(id: int):
     except IdNotFoundError:
         return {'error': 'Group not found'}, HTTPStatus.NOT_FOUND
 
-    return jsonify(new_groups), HTTPStatus.OK
+    return researched_group, HTTPStatus.OK
 
 
 @jwt_required()
@@ -177,7 +179,7 @@ def update_group(id: int):
         for key, value in data.items():
             setattr(group, key, value)
 
-        new_group = {
+        updated_group = {
             'id': group.id,
             'name': group.name,
             'description': group.description,
@@ -226,7 +228,7 @@ def update_group(id: int):
             'error': 'Invalid data type. Type must be a string'
         }, HTTPStatus.BAD_REQUEST
 
-    return jsonify(new_group), HTTPStatus.OK
+    return updated_group, HTTPStatus.OK
 
 
 @jwt_required()

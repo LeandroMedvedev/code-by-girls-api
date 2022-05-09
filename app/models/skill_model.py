@@ -33,3 +33,8 @@ class SkillModel(db.Model):
         ):
             raise LevelInvalidError
         return level
+
+    @validates('skill')
+    def title_skill(self, key, skill):
+
+        return skill.title()

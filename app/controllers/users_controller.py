@@ -28,7 +28,7 @@ s = URLSafeTimedSerializer('Thisisasecret!')
 
 def create_user():
 
-    data = request.get_json()
+    data: dict = request.get_json()
 
     received_keys, valid_keys, invalid_keys = check_user_data(data)
 
@@ -56,7 +56,7 @@ def create_user():
 
         validates_email(new_user.email)
 
-        return jsonify({'msg': 'verify you email!'}), HTTPStatus.CREATED
+        return jsonify({'msg': 'verify your email!'}), HTTPStatus.CREATED
 
     except InvalidEmailError:
         return {'error': 'Error'}, HTTPStatus.BAD_REQUEST
@@ -91,7 +91,7 @@ def att_user(id):
 
         if not user:
             return {'error': 'User not found'}, HTTPStatus.NOT_FOUND
-        
+
         for key, value in data.items():
             if key == 'name' and type(value) == str:
                 data[key] = value.title()

@@ -20,7 +20,7 @@ def login():
             return {'error': 'User not found!'}, HTTPStatus.NOT_FOUND
 
         if not user.is_validate:
-            return {"error": "email not validate!"}, HTTPStatus.UNAUTHORIZED
+            return {'error': 'email not validate!'}, HTTPStatus.UNAUTHORIZED
 
         if user.verify_password(data['password']):
             data = {'id': user.id, 'name': user.name, 'email': user.email}
