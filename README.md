@@ -199,7 +199,17 @@ Campos obrigatórios:
 ```  
 
 ## **<font color=00FF00>POST</font> /api/login - Formato da Resposta - <font color='FFA500'>400 BAD REQUEST</font>**  
-FALTANDO  (Matheus fará este tratamento)
+```py  
+{
+	"expected": [
+		"email",
+		"password"
+	],
+	"obtained": [
+		"email"
+	]
+}
+```  
 
 2. ***Caso 2 -*** *o email digitado é incorreto:*  
 
