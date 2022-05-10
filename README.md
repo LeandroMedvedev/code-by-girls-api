@@ -1624,7 +1624,7 @@ No body returned for response
 ## **<font color=F70D1A>DELETE</font> /api/comments/&lt;int:id&gt; - Formato da Resposta - <font color=FFA500>401 UNAUTHORIZED</font>**  
 ```py  
 {  
-	"msg": "It is possible to delete only your comments"  
+	"msg": "It is possible to delete only your comments"   
 }  
 ```  
 
